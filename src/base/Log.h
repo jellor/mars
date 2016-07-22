@@ -11,6 +11,7 @@
 #define __LOG_H__
 
 #include "NonCopyable.h"
+#include <string.h>
 #include <string>
 #include <functional>
 

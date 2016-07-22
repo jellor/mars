@@ -15,6 +15,7 @@
 #include <functional>
 #include <pthread.h>
 #include <sys/types.h>
+#include <string.h>
 #include <string>
 #include <unistd.h>
 #include <memory>

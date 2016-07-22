@@ -9,6 +9,7 @@
  *=======================================================*/
 
 #include "IpAddress.h"
+#include <string.h>
 
 using namespace mars;
 

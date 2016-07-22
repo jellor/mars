@@ -17,6 +17,7 @@
 #include <sys/types.h>
 #include <string>
 #include <unistd.h>
+#include <memory>
 
 namespace mars {
 

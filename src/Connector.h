@@ -26,6 +26,7 @@ public:
 	~Connector();
 
 	void start();
+	void join();
 	bool started() const { return started_; }
 	void setConnectCallback(const EventCallback& cb) { connect_callback_ = cb; }
 	void setReadCallback(const EventCallback& cb) 	 { read_callback_    = cb; }

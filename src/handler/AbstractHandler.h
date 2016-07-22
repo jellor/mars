@@ -24,7 +24,7 @@ public:
 	virtual void handle(ChannelPtr channel_ptr, void* object) = 0;
 
 	virtual const std::string& getName() const { return name_; }
-	virtual void setName(std::string& name)    { name_ = name; }
+	virtual void setName(const std::string& name)    { name_ = name; }
 
 private:
 	std::string name_;

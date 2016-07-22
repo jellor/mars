@@ -29,11 +29,13 @@ error_callback_(nullptr)
 }
 
 Acceptor::~Acceptor() {
+	DEBUG << "Acceptor Desstruct";
 	join();
 	for (int i = 0; i < socket_acceptor_list_.size(); i ++) {
 		delete socket_acceptor_list_[i];
 	}
 	socket_acceptor_list_.clear();	
+	DEBUG << "Acceptor Destructor ...";
 }
 
 void Acceptor::start() {

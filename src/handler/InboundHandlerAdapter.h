@@ -8,7 +8,7 @@
  *=======================================================*/
 
 #ifndef __INBOUND_HANDLER_ADAPTER_H__
-#define __TNBOUND_HANDLER_ADAPTER_H__
+#define __INBOUND_HANDLER_ADAPTER_H__
 
 #include "AbstractInboundHandler.h"
 
@@ -19,8 +19,8 @@ public:
 	InboundHandlerAdapter() 		 = default;
 	virtual ~InboundHandlerAdapter() = default;
 
-	virtual onRead(ChannelPtr channel_ptr, void* object) override {}
-	virtual onError(ChannelPtr channel_ptr) 			 override {}
+	virtual void onRead(ChannelPtr channel_ptr, void* object) override {}
+	virtual void onError(ChannelPtr channel_ptr) 			  override {}
 };
 
 }

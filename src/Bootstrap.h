@@ -27,9 +27,9 @@ public:
 	~Bootstrap();
 
 	void start();
+	void join();
 
 	void addChain(HandlerChain* channel_chain);
-	HandlerChain* activeHandlerChain(const ChannelPtr& channel_ptr) const;
 
 	void setFilterCallback(const FilterCallback& cb) { filter_callback_  = cb; }
 	void setConnectCallback(const EventCallback& cb) { connect_callback_ = cb; }
@@ -39,6 +39,9 @@ public:
 	void setErrorCallback(const EventCallback& cb)   { error_callback_ = cb;   }
 
 private:
+
+	HandlerChain* activeHandlerChain(const ChannelPtr& channel_ptr) const;
+
 	bool handleFilter(int fd, const IpAddress& local_address, const IpAddress& peer_address);
 	void handleConnect(const ChannelPtr& channel_ptr);
 	void handleRead(const ChannelPtr& channel_ptr);

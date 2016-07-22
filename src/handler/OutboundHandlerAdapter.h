@@ -19,8 +19,8 @@ public:
 	OutboundHandlerAdapter()		  = default;
 	virtual ~OutboundHandlerAdapter() = default;
 
-	virtual onWrite(ChannelPtr channel_ptr, void* object) override {}
-	virtual onError(ChannelPtr channel_ptr)				  override {}
+	virtual void onWrite(ChannelPtr channel_ptr, void* object) override {}
+	virtual void onError(ChannelPtr channel_ptr)				  override {}
 };
 
 }

@@ -45,12 +45,14 @@ chain_list_()
 
 Bootstrap::~Bootstrap() {
 	acceptor_->join();
+	connector_->join();
 	if (acceptor_ != nullptr) {
 		delete acceptor_;
 	}
 	if (connector_ != nullptr) {
 		delete connector_;
 	}
+	DEBUG << "Bootstrap Destructor ...";
 }
 
 void Bootstrap::start() {
@@ -60,6 +62,11 @@ void Bootstrap::start() {
 	if (connector_ != nullptr) {
 		connector_->start();
 	}
+}
+
+void Bootstrap::join() {
+	acceptor_->join();
+	connector_->join();
 }
 
 void Bootstrap::addChain(HandlerChain* channel_chain) {
@@ -101,6 +108,7 @@ void Bootstrap::handleRead(const ChannelPtr& channel_ptr) {
 	if (handler_chain != nullptr) {
 		handler_chain->doInHandler(channel_ptr, nullptr);
 	}
+	
 	// while (protobufCodec_.valid(channelPtr->getInBuffer())) {
 	// 	Message* message = protobufCodec_.decode(channelPtr->getInBuffer());
 	// 	if(message == nullptr) {

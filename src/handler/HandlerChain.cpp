@@ -8,6 +8,7 @@
  *=======================================================*/
 
 #include "HandlerChain.h"
+#include "Log.h"
 
 using namespace mars;
 
@@ -32,6 +33,7 @@ HandlerChain::~HandlerChain() {
 		out_handler_chain_head_ = out_handler_chain_head_->getNext();
 		delete temp;
 	}
+	DEBUG << "HandlerChain Destructor ...";
 }
 
 void HandlerChain::doInHandler(ChannelPtr channel_ptr, void* object) {

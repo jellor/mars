@@ -54,6 +54,10 @@ void Connector::start() {
 	}
 }
 
+void Connector::join() {
+	thread_.join();
+}
+
 void Connector::handleConnectEvent(ChannelPtr channel_ptr) {
 	DEBUG << "Handle Connect Event";
 	channel_ptr_set_.insert(channel_ptr);

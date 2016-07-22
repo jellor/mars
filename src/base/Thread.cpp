@@ -9,6 +9,7 @@
 
 #include "Thread.h"
 #include "Exception.h"
+#include "Log.h"
 #include <stdio.h>
 #include <sys/syscall.h> 
 #include <unistd.h>
@@ -160,6 +161,7 @@ bool Thread::join() {
 		ret = pthread_join(thread_id_, NULL);
 		started_ = false;	
 	}
+	DEBUG << "Join";
 	return ret == 0 ? true : false;
 }
 

@@ -10,17 +10,19 @@
 #ifndef __SELECTOR_H__
 #define __SELECTOR_H__
 
+#include "base/NonCopyable.h"
+#include <stdlib.h>
+
 namespace mars {
 
 class Handler;
 
-class Selector {
-
+class Selector : public NonCopyable {
 public:
-	Selector()  = default;
+	Selector()  		= default;
 	virtual ~Selector() = default;
 
-	virtual void select(int timeout) 			 = 0;
+	virtual void dispatch(int64_t timeout_usec)  = 0;
 	virtual void addHandler(Handler* handler) 	 = 0;
 	virtual void updateHandler(Handler* handler) = 0;
 	virtual void removeHandler(Handler* handler) = 0;

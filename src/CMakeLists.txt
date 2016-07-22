@@ -6,8 +6,10 @@ PROJECT(mars)
 #查找当前目录下的所有源文件, 并将名称保存到 SRC_LIST_X 变量
 AUX_SOURCE_DIRECTORY(./ SRC_LIST_1)
 AUX_SOURCE_DIRECTORY(./base SRC_LIST_2)
-AUX_SOURCE_DIRECTORY(./network SRC_LIST_3)
-AUX_SOURCE_DIRECTORY(./reactor SRC_LIST_4)
+AUX_SOURCE_DIRECTORY(./handler SRC_LIST_3)
+AUX_SOURCE_DIRECTORY(./network SRC_LIST_4)
+AUX_SOURCE_DIRECTORY(./reactor SRC_LIST_5)
+AUX_SOURCE_DIRECTORY(./reactor/selector SRC_LIST_6)
 
 SET(LIBRARY_OUTPUT_PATH ../lib)
 #SET(EXECUTABLE_OUTPUT_PATH ../bin)
@@ -19,7 +21,7 @@ ELSEIF(UNIX)
 ENDIF()
 
 #指定头文件的搜索路径, 相当于指定gcc的-I参数
-#INCLUDE_DIRECTORIES(./ ./selector)
+INCLUDE_DIRECTORIES(./ ./base ./handler ./network ./reactor)
 #动态链接库或静态链接库的搜索路径, 相当于gcc的-L参数
 #LINK_DIRECTORIES()
 
@@ -32,7 +34,7 @@ ENDIF()
 ADD_DEFINITIONS(-std=c++11 -Wlogical-op-parentheses -rdynamic -g)
 
 #编译生成程序库
-ADD_LIBRARY(mars STATIC ${SRC_LIST_1} ${SRC_LIST_2} ${SRC_LIST_3} ${SRC_LIST_4})
+ADD_LIBRARY(mars STATIC ${SRC_LIST_1} ${SRC_LIST_2} ${SRC_LIST_3} ${SRC_LIST_4} ${SRC_LIST_5} ${SRC_LIST_6})
 
 #指定生成目标
 #ADD_EXECUTABLE(test ${SRC_LIST_1})

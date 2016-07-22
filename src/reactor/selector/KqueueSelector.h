@@ -17,15 +17,15 @@
 #include <vector>
 #include <sys/event.h>
 
-namespace starnet {
+namespace mars {
 
 class KqueueSelector : public Selector {
 public:
 	KqueueSelector();
 	~KqueueSelector();
 
-	void select(int timeout) override;
-	void addHandler(Handler* handler) override;
+	void dispatch(int64_t timeout_usec)  override;
+	void addHandler(Handler* handler)    override;
 	void updateHandler(Handler* handler) override;
 	void removeHandler(Handler* handler) override;
 

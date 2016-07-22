@@ -38,10 +38,10 @@ build_lib() {
 
 	echo "cd "${LIB_DIR}
 	cd ${LIB_DIR}
-	if [ -e "libstarnet.a" ] ; then
-		echo "build lib (libstarnet.a) successed"
+	if [ -e "libmars.a" ] ; then
+		echo "build lib (libmars.a) successed"
 	else 
-		echo "build lib (libstarnet.a) failed"
+		echo "build lib (libmars.a) failed"
 	fi
 	cd ..
 }

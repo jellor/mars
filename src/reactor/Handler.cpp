@@ -44,6 +44,19 @@ void Handler::reset() {
 	error_callback_ = nullptr;
 }
 
+void Handler::reset(EventLoop* event_loop, int fd) {
+	remove();
+	event_loop_ 	= event_loop;
+	fd_         	= fd;
+	status_     	= NEW;
+	readable_   	= false;
+	writable_  	 	= false;
+	read_callback_  = nullptr;
+	write_callback_ = nullptr;
+	close_callback_ = nullptr;
+	error_callback_ = nullptr;
+}
+
 void Handler::update() {
 	if ((status_ == NEW || status_ == DEL) && (isReadable() || isWritable())) {
 		event_loop_->addHandler(this);

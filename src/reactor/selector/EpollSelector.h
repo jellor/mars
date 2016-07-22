@@ -12,22 +12,26 @@
 
 #ifdef __linux__
 #include "Selector.h"
+#include <set>
+#include <vector>
+#include <sys/epoll.h>
 
-namespace starnet {
+namespace mars {
 
 class EpollSelector : public Selector {
 public:
 	EpollSelector();
 	~EpollSelector();
 	
-	void select(int timeout) override;
-	void addHandler(Handler* handler) override;
+	void dispatch(int timeout_usec)      override;
+	void addHandler(Handler* handler)    override;
 	void updateHandler(Handler* handler) override;
 	void removeHandler(Handler* handler) override;
 
 private:
 	const int epfd_;
-
+	std::set<Handler*> handler_set_;
+	std::vector<struct epoll_event> active_event_list_;
 };
 
 }

@@ -11,9 +11,12 @@
 #define __HANDLER_H__
 
 #include "EventLoop.h"
+#include "NonCopyable.h"
 #include <functional>
  
 namespace mars {
+
+class EventLoop;
 
 typedef enum {
 	    NEW = 0,
@@ -21,7 +24,7 @@ typedef enum {
 	    DEL = 2,
 	} HandlerStatus;
 
-class Handler {
+class Handler : public NonCopyable {
 
 	typedef std::function<void()> EventCallback;
 
@@ -52,6 +55,7 @@ public:
 	void handleErrorEvent() { if (error_callback_ != nullptr) error_callback_(); }
 
 	void reset();
+	void reset(EventLoop* event_loop, int fd = -1);
 	void remove() { if (status_ == ADD) event_loop_->removeHandler(this); }
 	int fd() const { return fd_; }
 	void setStatus(HandlerStatus status) { status_ = status; }

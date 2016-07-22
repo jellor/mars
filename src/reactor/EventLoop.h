@@ -11,10 +11,24 @@
 #define __EVENT_LOOP_H__
 
 #include "Selector.h"
+#include "Lock.h"
+#include "Thread.h"
+#include "MinHeap.h"
+#include "TimerId.h"
+#include "NonCopyable.h"
+#include <functional>
+#include <vector>
+#include <memory>
 
 namespace mars {
 
-class EventLoop {
+class Handler;
+class Selector;
+
+class EventLoop : public NonCopyable {
+
+	typedef std::function<void(void)> Func;
+
 public:
 	EventLoop();
 	~EventLoop();
@@ -22,15 +36,41 @@ public:
 	void start();
 	void stop();
 
-	void addHandler(Handler* handler);
+	bool isStarted() const { return started_; }
+	bool isInSelfThread() const { return thread_id_ == Thread::getCurrentThreadId(); }
+	void doFunc(const Func& func);
+	TimerId addTimer(const TimerCallback& cb, int64_t timeout, double interval, int counter = 1);
+	void removeTimer(const TimerId& timerId);
+
+	void addHandler   (Handler* handler);
 	void updateHandler(Handler* handler);
-	void removeHandler(Handler* handler);
+    void removeHandler(Handler* handler);
 
+   	const void* getContext() const { return context_; }
+   	void* getMutableContext() const { return context_; }
+   	void setContext(void* context) { context_ = context; }
+  
 private:
+	void pushTimer(Timer* timer);
+	void eraseTimer(Timer* timer);
 	void loop();
+	void doTimeout(int64_t now);
+	void doFuncs();
+	void pushFunc(const Func& func);
+	void wakeup();
+	void consume();
 
-	Selector* selector_;
-	bool started_;
+	std::atomic<bool> started_;
+	const pid_t thread_id_;
+	void* context_;
+	std::unique_ptr<Selector> selector_;
+	std::vector<Func> funcs_;
+	Mutex mutex_;
+	std::atomic<bool> calling_funcs_;
+	std::unique_ptr<MinHeap<Timer>> heap_;
+
+	Handler* read_handler_;
+	Handler* write_handler_;
 };
 
 }

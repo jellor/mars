@@ -9,9 +9,10 @@
 
 #ifdef __APPLE__
 #include "KqueueSelector.h"
+#include "Log.h"
 #include <unistd.h>
 
-using namespace starnet;
+using namespace mars;
 
 KqueueSelector::KqueueSelector():
 kqfd_(kqueue()),
@@ -25,12 +26,12 @@ KqueueSelector::~KqueueSelector() {
 	close(kqfd_);
 }
 
-void KqueueSelector::select(int timeout_ms) {
+void KqueueSelector::dispatch(int64_t timeout_usec) {
 	int active_count = 0;
 
 	struct timespec timeout;
-	timeout.tv_sec = timeout_ms / 1000;
-	timeout.tv_nsec = (timeout_ms % 1000) * 1000000;
+	timeout.tv_sec  = timeout_usec / 1000000;
+	timeout.tv_nsec = (timeout_usec % 1000000) * 1000;
 
 	active_count = kevent(kqfd_, NULL, 0, &*active_event_list_.begin(), active_event_list_.size(), &timeout);
 
@@ -39,15 +40,19 @@ void KqueueSelector::select(int timeout_ms) {
 		Handler* active_handler = (Handler*) active_event.udata;
 
 		if (active_event.flags & EV_ERROR) {
-
+			DEBUG << "EV_ERROR";
+			active_handler->handleErrorEvent();
 		}
 		if (active_event.flags & EV_EOF) {
-
+			DEBUG << "EV_EOF";
+			active_handler->handleCloseEvent();
 		}
 		if (active_event.filter == EVFILT_READ) {
+			DEBUG << "EVFILT_READ";
 			active_handler->handleReadEvent();
 		}
 		if (active_event.filter == EVFILT_WRITE) {
+			DEBUG << "EVFILT_WRITE";
 			active_handler->handleWriteEvent();
 		}
 	}

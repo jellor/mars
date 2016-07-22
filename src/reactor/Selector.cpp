@@ -13,7 +13,7 @@
 
 using namespace mars;
 
-Selector* newSelector() {
+Selector* Selector::newSelector() {
 #ifdef __linux__
 	return new EpollSelector();
 #elif __APPLE__

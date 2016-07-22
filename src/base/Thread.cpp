@@ -79,7 +79,7 @@ void ThreadSpace::startThread() {
 	thread_name = name_.empty() ? "Unknown Thread" : name_.c_str();
 
 #ifdef __linux__
-	pthread_setname_np(thread_self(), name_.c_str());
+	pthread_setname_np(pthread_self(), name_.c_str());
 #elif __APPLE__
 	pthread_setname_np(name_.c_str());
 #else

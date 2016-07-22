@@ -11,6 +11,7 @@
 #define __RING_BUFFER_H__
 
 #include "NonCopyable.h"
+#include <string.h>
 
 namespace mars {
 

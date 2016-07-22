@@ -11,6 +11,8 @@
 #define __TIMER_H__
 
 #include "MinHeap.h"
+#include <functional>
+#include <atomic>
 
 namespace mars {
 

@@ -56,7 +56,7 @@ public:
 
 	void reset();
 	void reset(EventLoop* event_loop, int fd = -1);
-	void remove() { if (status_ == ADD) event_loop_->removeHandler(this); }
+	void remove();
 	int fd() const { return fd_; }
 	void setStatus(HandlerStatus status) { status_ = status; }
 	HandlerStatus getStatus() const { return status_; }

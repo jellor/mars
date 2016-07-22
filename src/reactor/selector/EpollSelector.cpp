@@ -74,7 +74,7 @@ void EpollSelector::addHandler(Handler* handler) {
 	if (handler->isReadable()) {
 		ev.events |= EPOLLIN;
 	}
-	if (epoll_ctl(epollfd_, EPOLL_CTL_ADD, handler->fd(), &ev) != 0) {
+	if (epoll_ctl(epfd_, EPOLL_CTL_ADD, handler->fd(), &ev) != 0) {
 		WARN << "Cannot Add Event To Epoll";
 		WARN << "errno => " << errno;
 	}
@@ -93,7 +93,7 @@ void EpollSelector::updateHandler(Handler* handler) {
 	if (handler->isReadable()) {
 		ev.events |= EPOLLIN;
 	}
-	if (epoll_ctl(epollfd_, EPOLL_CTL_MOD, handler->fd(), &ev) != 0) {
+	if (epoll_ctl(epfd_, EPOLL_CTL_MOD, handler->fd(), &ev) != 0) {
 		WARN << "Cannot Mod Event To Epoll";
 		WARN << "errno => " << errno;
 	}
@@ -101,7 +101,7 @@ void EpollSelector::updateHandler(Handler* handler) {
 }
 
 void EpollSelector::removeHandler(Handler* handler) {
-	if (epoll_ctl(epollfd_, EPOLL_CTL_DEL, handler->fd(), NULL) != 0) {
+	if (epoll_ctl(epfd_, EPOLL_CTL_DEL, handler->fd(), NULL) != 0) {
 		WARN << "Cannot DEL Event To Epoll";
 		WARN << "errno => " << errno;
 	}

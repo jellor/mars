@@ -12,7 +12,7 @@ LINK_DIRECTORIES(../lib)
 #ADD_SUBDIRECTORY()
 
 #添加编译参数
-ADD_DEFINITIONS(-std=c++11 -Wlogical-op-parentheses -rdynamic -g)
+ADD_DEFINITIONS(-std=c++11 -rdynamic -g)
 
 #编译生成程序库
 #ADD_LIBRARY()
@@ -20,9 +20,9 @@ ADD_DEFINITIONS(-std=c++11 -Wlogical-op-parentheses -rdynamic -g)
 #指定生成目标
 ADD_EXECUTABLE(Server Server.cpp)
 #添加链接库, 相同于指定-l参数
-TARGET_LINK_LIBRARIES(Server mars)
+TARGET_LINK_LIBRARIES(Server mars pthread)
 
 #指定生成目标
 ADD_EXECUTABLE(Client Client.cpp)
 #添加链接库, 相同于指定-l参数
-TARGET_LINK_LIBRARIES(Client mars)
+TARGET_LINK_LIBRARIES(Client mars pthread)

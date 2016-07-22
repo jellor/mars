@@ -23,7 +23,7 @@ public:
 	EpollSelector();
 	~EpollSelector();
 	
-	void dispatch(int timeout_usec)      override;
+	void dispatch(int64_t timeout_usec)  override;
 	void addHandler(Handler* handler)    override;
 	void updateHandler(Handler* handler) override;
 	void removeHandler(Handler* handler) override;

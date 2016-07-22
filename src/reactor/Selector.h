@@ -11,6 +11,7 @@
 #define __SELECTOR_H__
 
 #include "base/NonCopyable.h"
+#include "Handler.h"
 #include <stdlib.h>
 
 namespace mars {

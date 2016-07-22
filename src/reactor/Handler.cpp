@@ -57,6 +57,11 @@ void Handler::reset(EventLoop* event_loop, int fd) {
 	error_callback_ = nullptr;
 }
 
+void Handler::remove() {
+	if (status_ == ADD) {
+		event_loop_->removeHandler(this);
+	}
+}
 void Handler::update() {
 	if ((status_ == NEW || status_ == DEL) && (isReadable() || isWritable())) {
 		event_loop_->addHandler(this);

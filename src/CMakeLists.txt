@@ -31,7 +31,7 @@ INCLUDE_DIRECTORIES(./ ./base ./handler ./network ./reactor)
 #ADD_SUBDIRECTORY()
 
 #添加编译参数
-ADD_DEFINITIONS(-std=c++11 -Wlogical-op-parentheses -rdynamic -g)
+ADD_DEFINITIONS(-std=c++11 -rdynamic -g)
 
 #编译生成程序库
 ADD_LIBRARY(mars STATIC ${SRC_LIST_1} ${SRC_LIST_2} ${SRC_LIST_3} ${SRC_LIST_4} ${SRC_LIST_5} ${SRC_LIST_6})

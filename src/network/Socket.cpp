@@ -19,7 +19,7 @@
 using namespace mars;
 
 Socket::Socket():
-sockfd_(socket(AF_INET, SOCK_STREAM, 0)) 
+sockfd_(socket(AF_INET, SOCK_STREAM, 0))
 {
 	setNonBlock(true);
 	int flags = fcntl(sockfd_, F_GETFD, 0);
@@ -29,8 +29,8 @@ sockfd_(socket(AF_INET, SOCK_STREAM, 0))
 	}
 }
 
-Socket::Socket(int sockfd): 
-sockfd_(sockfd) 
+Socket::Socket(int sockfd):
+sockfd_(sockfd)
 {
 	setNonBlock(true);
 	int flags = fcntl(sockfd_, F_GETFD, 0);
@@ -51,7 +51,7 @@ int Socket::bind(const IpAddress& IpAddress) {
 }
 
 int Socket::listen() {
-	int ret = ::listen(sockfd_, 64);
+	int ret = ::listen(sockfd_, 1024);
 	return ret;
 }
 
@@ -103,7 +103,7 @@ void Socket::setReusePort(bool on) {
 	int optval = on ? 1 : 0;
 	int ret = setsockopt(sockfd_, SOL_SOCKET, SO_REUSEPORT, reinterpret_cast<char*>(&optval), sizeof(optval));
 	if (ret < 0) {
-		
+
 	}
 #else
 #error "Platform Not Supported"
@@ -181,7 +181,7 @@ bool Socket::isSelfConnect(int sockfd) {
 	IpAddress peer_address;
 	if (getLocalAddress(sockfd, &local_address) && getPeerAddress(sockfd, &peer_address)) {
 		if (local_address == peer_address) {
-			return true; 
+			return true;
 		} else {
 			return false;
 		}

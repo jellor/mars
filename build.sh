@@ -88,11 +88,9 @@ build_bin() {
 	fi
 }
 
-
 print_help() {
 	echo "Help :"
 }
-
 
 case $1 in 
 	lib)

@@ -29,7 +29,7 @@ public:
 	void push(const Task& task);
 	unsigned int size() const { return thread_count_; }
 private:
-	void runThread();
+	void runInThread();
 
 	const unsigned int thread_count_; 
 	bool started_;

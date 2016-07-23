@@ -77,6 +77,7 @@ void Acceptor::handleAcceptEvent(int fd, const IpAddress& local_address, const I
 	} else {
 		channel_ptr = acceptor_group_.push(fd, local_address, peer_address);
 	}
+	
 	channel_ptr->getHandler()->enableRead();
 	channel_ptr->setReadCallback(std::bind(&Acceptor::handleRead, this, channel_ptr));
 	channel_ptr->setCloseCallback(std::bind(&Acceptor::handleClose, this, channel_ptr));

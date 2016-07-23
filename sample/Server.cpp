@@ -64,18 +64,21 @@ public:
 	}
 
 private:
-	Bootstrap bootstrap_;
+	Bootstrap 	 bootstrap_;
 	HandlerChain http_chain_;
 	HandlerChain tcp_chain_;
+
 };
 
 int main() {
 	IpAddress listen_address("127.0.0.1", 8090);
-	//IpAddr connectAddr("121.42.37.52", 8080);
+
 	std::vector<IpAddress*> listen_address_list;
 	listen_address_list.push_back(&listen_address);
 	std::vector<IpAddress*> connect_address_list;
+
 	//connectAddrList.push_back(&connectAddr);
+
 	Server server(listen_address_list, connect_address_list, 1, 5, 2);
 
 	ServerHandler* handler = new ServerHandler();

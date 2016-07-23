@@ -38,7 +38,7 @@ void ThreadPool::start() {
 	for (int i = 0; i < thread_count_; i ++) {
 		char buf[32];
 		snprintf(buf, sizeof(buf), "ThreadPool Index -> %d", i);
-		threads_[i] = new Thread(std::bind(&ThreadPool::runThread, this), buf);
+		threads_[i] = new Thread(std::bind(&ThreadPool::runInThread, this), buf);
 		threads_[i]->start();
 	}
 }
@@ -70,7 +70,7 @@ void ThreadPool::push(const Task& task) {
 	condition_.signal();
 }
 
-void ThreadPool::runThread() {
+void ThreadPool::runInThread() {
 	Task task;
 	while (true) {
 		{

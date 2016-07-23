@@ -61,8 +61,9 @@ void Connector::join() {
 void Connector::handleConnectEvent(ChannelPtr channel_ptr) {
 	DEBUG << "Handle Connect Event";
 	channel_ptr_set_.insert(channel_ptr);
-	channel_ptr->setConnectCallback(std::bind(&Connector::handleConnect, this, channel_ptr));
-	channel_ptr->setReadCallback(std::bind(&Connector::handleRead, this, channel_ptr));
+	handleConnect(channel_ptr);
+	//channel_ptr->setConnectCallback(std::bind(&Connector::handleConnect, this, channel_ptr));
+	channel_ptr->setReadCallback(std::bind(&Connector::handleRead,   this, channel_ptr));
 	channel_ptr->setCloseCallback(std::bind(&Connector::handleClose, this, channel_ptr));
 	channel_ptr->setWriteCallback(std::bind(&Connector::handleWrite, this, channel_ptr));
 	channel_ptr->setErrorCallback(std::bind(&Connector::handleError, this, channel_ptr));

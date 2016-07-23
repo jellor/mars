@@ -3,6 +3,7 @@
 #include "Log.h"
 #include "AbstractInboundHandler.h"
 #include "Timestamp.h"
+#include "Thread.h"
 #include <iostream>
 
 using namespace mars;
@@ -74,13 +75,14 @@ private:
 
 int main() {
 
-	IpAddress ip_address("127.0.0.1", 8090);
+	IpAddress ip_address("14.215.177.38", 80);
 
+	cout << "Enter A Number (If 0 Will Connect To 127.0.0.1:8090, Otherwise To 121.42.37.52:8090)" << endl;
 	int flag;
-	cout << "Enter A Number (If 0 Will Go ... , Otherwise End)" << endl;
 	cin >> flag;
 	if (flag != 0) {
-		return 0;
+		IpAddress address("121.42.37.52", 8090);
+		ip_address = address;
 	}
 
 	cout << "Enter A Connection Number" << endl;;
@@ -95,6 +97,9 @@ int main() {
 	for (int i = 0; i < count; i ++) {
 		connect_address_list.push_back(&ip_address);
 	}
+
+	Thread::sleep(5);
+
 	DEBUG << "End   " << Timestamp::now().toString();
 
 	

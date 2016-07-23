@@ -107,7 +107,7 @@ void* threadFunc(void* arg) {
 	return NULL;
 }
 
-std::atomic<unsigned int> Thread::create_count_(0);
+std::atomic<unsigned int> Thread::created_count_(0);
 
 Thread::Thread(const ThreadFunc& thread_func, const std::string& name):
 started_(false),
@@ -117,10 +117,10 @@ tid_(new pid_t(0)),
 thread_id_(0),
 thread_func_(thread_func)
 {	
-	create_count_++;
+	created_count_++;
 	if (name_.empty()) {
 		char buf[32];
-		snprintf(buf, sizeof(buf), "Unknown Thread %d", create_count_.load());
+		snprintf(buf, sizeof(buf), "Unknown Thread %d", created_count_.load());
 		name_ = buf;
 	}
 }

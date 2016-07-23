@@ -39,7 +39,7 @@ public:
 
 	static void sleep(double seconds) { usleep(seconds * 1000000); }
 	static bool isMainThread() { return strcmp(getCurrentThreadName().c_str(), "Main") == 0 ? true : false; }
-	static int getCreatedCount() { return create_count_.load(); }
+	static int getCreatedCount() { return created_count_.load(); }
 	static int getCurrentThreadId();
 	static std::string getCurrentThreadName();
 
@@ -51,7 +51,7 @@ private:
 	pthread_t thread_id_;
 	ThreadFunc thread_func_;
 
-	static std::atomic<unsigned int> create_count_;
+	static std::atomic<unsigned int> created_count_;
 };
 
 }

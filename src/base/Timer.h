@@ -29,7 +29,7 @@ public:
 	int64_t timeout() const { return timeout_; }
 
 	// MinHeapInterface implement
-	bool operator >(const Timer& rhs) override;
+	bool operator > (const Timer& rhs) override;
 	int  getIndex() const override;
 	void setIndex(int index) override;
 	const uint64_t getSequence() const { return sequence_; }

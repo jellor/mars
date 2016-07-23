@@ -19,7 +19,6 @@
 
 namespace mars {
 
-
 class Channel : public std::enable_shared_from_this<Channel> {
 
 	typedef std::function<void(const std::shared_ptr<Channel>&)> EventCallback;

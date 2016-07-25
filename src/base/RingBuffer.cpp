@@ -9,10 +9,12 @@
  *=======================================================*/
 
 #include "RingBuffer.h"
+#include "Log.h"
 #include <stdlib.h>
 #include <string>
 #include <sys/uio.h>
 #include <unistd.h>
+#include <errno.h>
 
 using namespace mars;
 
@@ -74,6 +76,12 @@ int RingBuffer::write(int sockfd) { // ? can loop write()
 		size = ::writev(sockfd, iv, 2);
 	} else {
 		size = ::write(sockfd, buffer_ + head_index, tail_index - head_index);
+	}
+	if (size < 0) {
+		size = 0;
+		DEBUG << "--------- IMPORTANT ERROR ----------";
+		DEBUG << "ERRNO => " << errno;
+		DEBUG << "--------- IMPORTANT ERROR ----------";
 	}
 	head_index = (head_index + size) % capacity_;
 	size_      = size_ - size;

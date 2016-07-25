@@ -57,6 +57,7 @@ void SocketAcceptor::onAccept() {
 	if (fd != -1) {
 		accept_callback_(fd, ip_address_, peer_address);
 	} else {
+		WARN << "Accept Errno => " << errno;
 		if (errno == ENOMEM) {
 			close(null_fd_);
 			fd = ::accept(socket_.fd(), 0, 0);

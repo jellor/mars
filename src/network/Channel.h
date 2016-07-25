@@ -33,6 +33,7 @@ public:
 	void setCloseCallback(const EventCallback& cb)   { close_callback_ = cb;   }
 	void setErrorCallback(const EventCallback& cb)   { error_callback_ = cb;   }
 
+	bool isOpened() const { return opened_; }
 	void reset();
 	void close();
 
@@ -56,7 +57,8 @@ public:
 
 	void setSocket(int sockfd) {
 		socket_ = Socket(sockfd);
-		handler_.setFd(sockfd);
+		opened_ = true;
+		handler_.setFd(sockfd);	
 	}
 
 	void setLocalAddress(const IpAddress& local_address) {
@@ -81,6 +83,7 @@ private:
 	Handler handler_;
 	RingBuffer out_buffer_;
 	RingBuffer in_buffer_;
+	bool opened_;
 
 	EventCallback connect_callback_;
 	EventCallback read_callback_;

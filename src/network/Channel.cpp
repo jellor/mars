@@ -53,7 +53,11 @@ void Channel::reset() {
 }
 
 void Channel::close() {
+<<<<<<< HEAD
 	opened_ = false;
+=======
+
+>>>>>>> e86e33ba9fd280250d0faaf5ce93220d99ecbae0
 }
 
 void Channel::send(const RingBuffer* buffer) {
@@ -167,11 +171,18 @@ void Channel::handleReadEvent() {
 		DEBUG << "Ret " << ret << " error " << error;
 		DEBUG << "Receive Size => " << size;
 		if (close_callback_ != nullptr) close_callback_(shared_from_this());
+	} else {
+        DEBUG << "in_buffer Size " << in_buffer_.size() << " Capacity " << in_buffer_.capacity();
+        if (read_callback_ != nullptr) {
+            read_callback_(shared_from_this());
+        }
 	}
-	DEBUG << "in_buffer_ Size " << in_buffer_.size() << " Capacity " << in_buffer_.capacity();
-	if (read_callback_ != nullptr) {
-		read_callback_(shared_from_this());
-	}
+
+	// DEBUG << "in_buffer_ Size " << in_buffer_.size() << " Capacity " << in_buffer_.capacity();
+	// if (read_callback_ != nullptr) {
+	// 	read_callback_(shared_from_this());
+	// }
+	
 }
 
 void Channel::handleWriteEvent() {

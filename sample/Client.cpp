@@ -33,8 +33,8 @@ public:
 
 class Client {
 public:
-	Client(const std::vector<IpAddress*>& listen_address_list, const std::vector<IpAddress*>& connect_address_list, 
-		int acceptor_count, int worker_count, int worker_thread_count): 
+	Client(const std::vector<IpAddress*>& listen_address_list, const std::vector<IpAddress*>& connect_address_list,
+		int acceptor_count, int worker_count, int worker_thread_count):
 		bootstrap_(listen_address_list, connect_address_list, acceptor_count, worker_count, worker_thread_count),
 		http_chain_(),
 		tcp_chain_()
@@ -75,9 +75,9 @@ private:
 
 int main() {
 
-	IpAddress ip_address("14.215.177.38", 80);
+	IpAddress ip_address("127.0.0.1", 8090);
 
-	cout << "Enter A Number (If 0 Will Connect To 127.0.0.1:8090, Otherwise To 121.42.37.52:8090)" << endl;
+	cout << "Enter A Number (If 0 Will Connect To " << ip_address.toString() << ", Otherwise To 121.42.37.52:8090)" << endl;
 	int flag;
 	cin >> flag;
 	if (flag != 0) {
@@ -102,7 +102,7 @@ int main() {
 
 	DEBUG << "End   " << Timestamp::now().toString();
 
-	
+
 	Client Client(listen_address_list, connect_address_list, 1, 5, 2);
 
 	ClientHandler* handler = new ClientHandler();
@@ -110,7 +110,7 @@ int main() {
 	Client.addInHandler(handler);
 
 	Client.start();
-	
+
 	DEBUG << "STOP";
 	return 0;
 }

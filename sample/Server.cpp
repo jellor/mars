@@ -2,6 +2,7 @@
 #include "InboundHandlerAdapter.h"
 #include "Log.h"
 #include "AbstractInboundHandler.h"
+#include "Thread.h"
 
 using namespace mars;
 
@@ -18,6 +19,7 @@ public:
 
 	void onRead(ChannelPtr channel_ptr, void* object) override {
 		DEBUG << "............. OK .............";
+		Thread::sleep(10);
 		if (object == nullptr) {
 			DEBUG << "Object Is Nullptr";
 		} else {
@@ -75,11 +77,12 @@ int main() {
 
 	std::vector<IpAddress*> listen_address_list;
 	listen_address_list.push_back(&listen_address);
+	listen_address_list.push_back(&listen_address);
 	std::vector<IpAddress*> connect_address_list;
 
 	//connectAddrList.push_back(&connectAddr);
 
-	Server server(listen_address_list, connect_address_list, 1, 5, 2);
+	Server server(listen_address_list, connect_address_list, 2, 5, 2);
 
 	ServerHandler* handler = new ServerHandler();
 

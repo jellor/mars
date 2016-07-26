@@ -37,6 +37,8 @@ public:
 	void reset();
 	void close();
 
+	void metadata();
+
 	void send(const RingBuffer* buffer); // TODO
 	void send(const char* data, unsigned int size);
 

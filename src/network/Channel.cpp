@@ -53,11 +53,11 @@ void Channel::reset() {
 }
 
 void Channel::close() {
-<<<<<<< HEAD
 	opened_ = false;
-=======
+}
 
->>>>>>> e86e33ba9fd280250d0faaf5ce93220d99ecbae0
+void Channel::metadata() {
+	
 }
 
 void Channel::send(const RingBuffer* buffer) {

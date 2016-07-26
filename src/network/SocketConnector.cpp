@@ -41,6 +41,7 @@ void SocketConnector::run() {
 			handler_->setWriteCallback(std::bind(&SocketConnector::onWritable, this));
 			handler_->enableWrite();
 		} else {
+			DEBUG << "Connect errno = > " << err;
 			handleErrorCallback();
 		}
 	} 

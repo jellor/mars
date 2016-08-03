@@ -15,11 +15,12 @@
 #include "IpAddress.h"
 #include "Handler.h"
 #include "ChannelPool.h"
+#include "Log.h"
 
 namespace mars {
 
 class SocketConnector : public NonCopyable {
-	typedef std::function<void(ChannelPtr)> ConnectCallback;
+	typedef std::function<void(const ChannelPtr&)> ConnectCallback;
 	typedef std::function<void(void)> ErrorCallback;
 public:
 	SocketConnector(EventLoop* event_loop, const IpAddress& peer_address);
@@ -32,8 +33,19 @@ public:
 private:
 	void run();
 	void onWritable();
-	void handleConnectCallback(ChannelPtr channel_ptr) { if (connect_callback_ != nullptr) connect_callback_(channel_ptr); }
-	void handleErrorCallback() { if (error_callback_ != nullptr) error_callback_(); }
+
+	void handleConnectCallback(const ChannelPtr& channel_ptr) { 
+		if (connect_callback_ != nullptr) {
+			DEBUG << "handle Connect Callback != nullptr ";
+			connect_callback_(channel_ptr); 
+		} else {
+			DEBUG << "handle ConnectCallback == nullptr";
+		}
+	}
+
+	void handleErrorCallback() { 
+		if (error_callback_ != nullptr) error_callback_(); 
+	}
 
 	EventLoop* event_loop_;
 	IpAddress peer_address_;

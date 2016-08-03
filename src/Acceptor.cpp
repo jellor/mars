@@ -9,6 +9,7 @@
 
 #include "Acceptor.h"
 #include "Log.h"
+#include "ChannelPool.h"
 #include <unistd.h> 
 #include <fcntl.h>
 #include <errno.h>
@@ -21,6 +22,7 @@ worker_group_(worker_count),
 ip_address_list_(ip_address_list),
 socket_acceptor_list_(),
 filter_callback_(nullptr),
+connect_callback_(nullptr),
 read_callback_(nullptr),
 write_callback_(nullptr),
 close_callback_(nullptr),
@@ -29,13 +31,13 @@ error_callback_(nullptr)
 }
 
 Acceptor::~Acceptor() {
-	DEBUG << "Acceptor Desstruct";
+	DEBUG << "Acceptor Desstruct ...";
 	join();
 	for (int i = 0; i < socket_acceptor_list_.size(); i ++) {
 		delete socket_acceptor_list_[i];
 	}
 	socket_acceptor_list_.clear();	
-	DEBUG << "Acceptor Destructor ...";
+	DEBUG << "Acceptor Destructor Ok";
 }
 
 void Acceptor::start() {
@@ -71,18 +73,41 @@ void Acceptor::handleAcceptEvent(int fd, const IpAddress& local_address, const I
 	}
 
 	DEBUG << "Fd => " << fd << " Local Address => " << local_address.toString() << " Peer Address => " << peer_address.toString();
+
 	ChannelPtr channel_ptr;
+
+	EventLoop* event_loop = nullptr;
+
 	if (worker_group_.size() > 0) {
-		channel_ptr = worker_group_.push(fd, local_address, peer_address); 
+		// worker_group_.push() 
+		event_loop = worker_group_.next(); 
 	} else {
-		channel_ptr = acceptor_group_.push(fd, local_address, peer_address);
+		// acceptor_group_.push()
+		event_loop = acceptor_group_.next();
 	}
 
+	if (event_loop == nullptr) {
+		DEBUG << "Event Loop Should Not Nullptr";
+		return ;
+	}
+
+	event_loop->doFunc(std::bind(&Acceptor::runInEventLoop, this, event_loop, fd, local_address, peer_address));
+	
+}
+
+void Acceptor::runInEventLoop(EventLoop* event_loop, int fd, const IpAddress& local_address, const IpAddress& peer_address) {
+
+	//ChannelPtr channel_ptr(new Channel(event_loop, fd, local_address, peer_address));
+	ChannelPtr channel_ptr = (static_cast<ChannelPool*> (event_loop->getMutableContext()))
+								->acquire(event_loop, fd, local_address, peer_address);
+
+	handleConnect(channel_ptr);
+	channel_ptr->setReadCallback(std::bind(&Acceptor::handleRead, this, std::placeholders::_1));
+	channel_ptr->setCloseCallback(std::bind(&Acceptor::handleClose, this, std::placeholders::_1));
+	channel_ptr->setWriteCallback(std::bind(&Acceptor::handleWrite, this, std::placeholders::_1));
+	channel_ptr->setErrorCallback(std::bind(&Acceptor::handleError, this, std::placeholders::_1));
+
 	channel_ptr->getHandler()->enableRead();
-	channel_ptr->setReadCallback(std::bind(&Acceptor::handleRead, this, channel_ptr));
-	channel_ptr->setCloseCallback(std::bind(&Acceptor::handleClose, this, channel_ptr));
-	channel_ptr->setWriteCallback(std::bind(&Acceptor::handleWrite, this, channel_ptr));
-	channel_ptr->setErrorCallback(std::bind(&Acceptor::handleError, this, channel_ptr));
 }
 
 

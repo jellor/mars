@@ -18,16 +18,9 @@ next_(nullptr)
 }
 
 AbstractInboundHandler::~AbstractInboundHandler() {
+	DEBUG << "AbstractInboundHandler Destructor ...";
 	if (next_ != nullptr) {
 		delete next_;
-	}
-}
-
-void AbstractInboundHandler::handle(ChannelPtr channel_ptr, void* object) {
-	try {
-		onRead(channel_ptr, object);
-	} catch (...) {
-		onError(channel_ptr);
 	}
 }
 

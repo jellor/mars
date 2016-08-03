@@ -17,6 +17,7 @@
 #include "Handler.h"
 #include "IpAddress.h"
 #include "Channel.h"
+#include "Log.h"
 #include <vector>
 
 namespace mars {
@@ -34,12 +35,17 @@ public:
 	int getThreadCount();
 
 	void setFilterCallback(const FilterCallback& cb) { filter_callback_  = cb; }
+	void setConnectCallback(const EventCallback& cb) { connect_callback_ = cb; }
 	void setReadCallback(const EventCallback& cb) 	 { read_callback_    = cb; }
 	void setWriteCallback(const EventCallback& cb)   { write_callback_ = cb;   }
 	void setCloseCallback(const EventCallback& cb)   { close_callback_ = cb;   }
 	void setErrorCallback(const EventCallback& cb)   { error_callback_ = cb;   }
 
 private:
+
+	void handleConnect(const ChannelPtr& channel_ptr) {
+		if (connect_callback_ != nullptr) connect_callback_(channel_ptr);
+	}
 	
 	void handleRead(const ChannelPtr& channel_ptr)  {
 		if (read_callback_ != nullptr) read_callback_(channel_ptr);
@@ -57,6 +63,8 @@ private:
 		if (error_callback_ != nullptr) error_callback_(channel_ptr);
 	}
 	
+	void runInEventLoop(EventLoop* event_loop, int fd, const IpAddress& local_address, const IpAddress& peer_address);
+	
 	void handleAcceptEvent(int fd, const IpAddress& local_address, const IpAddress& peer_address);
 
 	EventLoopGroup acceptor_group_;
@@ -65,6 +73,7 @@ private:
 	std::vector<SocketAcceptor*> socket_acceptor_list_;
 
 	FilterCallback filter_callback_;
+	EventCallback connect_callback_;
 	EventCallback read_callback_;
 	EventCallback write_callback_;
 	EventCallback close_callback_;

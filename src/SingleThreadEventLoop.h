@@ -13,7 +13,6 @@
 #include "Thread.h"
 #include "EventLoop.h"
 #include "Channel.h"
-#include <set>
 
 namespace mars {
 
@@ -30,9 +29,8 @@ public:
 
 private:
 	void runInThread();
-	std::atomic<bool> started;
-	Thread thread_;
-	std::set<std::shared_ptr<Channel>>* channel_ptr_set_;	
+	std::atomic<bool> started_;
+	Thread thread_;	
 	EventLoop* event_loop_;
 };
 

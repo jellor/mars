@@ -19,9 +19,7 @@ namespace mars {
 class AbstractHandler : public NonCopyable {
 public:
 	AbstractHandler(): name_() {};
-	virtual ~AbstractHandler() = default;
-
-	virtual void handle(ChannelPtr channel_ptr, void* object) = 0;
+	virtual ~AbstractHandler() { DEBUG << "AbstractHandler Destructor ..."; };
 
 	virtual const std::string& getName() const { return name_; }
 	virtual void setName(const std::string& name)    { name_ = name; }

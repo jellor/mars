@@ -32,9 +32,9 @@ public:
 	unsigned int size() const { return thread_count_; }
 
 private:
-	void runInEventLoop(ChannelPtr channel_ptr);
+	void runInEventLoop(const ChannelPtr& channel_ptr);
 	const unsigned int thread_count_;
-	bool started;
+	std::atomic<bool> started;
 	int thread_index_;
 	SingleThreadEventLoop** threads_;
 };

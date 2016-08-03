@@ -62,7 +62,6 @@ public:
 	HandlerStatus getStatus() const { return status_; }
 
 	void setEventLoop(EventLoop* event_loop) { event_loop_ = event_loop; }
-	void setFd(int fd) { fd_ = fd; }
 	
 private:
 	void update();

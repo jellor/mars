@@ -24,7 +24,7 @@ sequence_(getCreatedCount())
 }
 
 Timer::~Timer() {
-
+	
 }
 
 bool Timer::isValid() {

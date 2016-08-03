@@ -33,11 +33,17 @@ void KqueueSelector::dispatch(int64_t timeout_usec) {
 	timeout.tv_sec  = timeout_usec / 1000000;
 	timeout.tv_nsec = (timeout_usec % 1000000) * 1000;
 
+
 	active_count = kevent(kqfd_, NULL, 0, &*active_event_list_.begin(), active_event_list_.size(), &timeout);
+
 
 	for (int i = 0; i < active_count; i ++) {
 		struct kevent& active_event = active_event_list_[i];
 		Handler* active_handler = (Handler*) active_event.udata;
+
+		DEBUG << "errno => " << errno;
+		DEBUG << "fd    => " << active_handler->fd();
+		DEBUG << "status=> " << active_handler->getStatus();
 
 		if (active_event.flags & EV_ERROR) {
 			DEBUG << "EV_ERROR";
@@ -45,7 +51,7 @@ void KqueueSelector::dispatch(int64_t timeout_usec) {
 		}
 		if (active_event.flags & EV_EOF) {
 			DEBUG << "EV_EOF";
-			active_handler->handleCloseEvent();
+			//active_handler->handleCloseEvent();
 		}
 		if (active_event.filter == EVFILT_READ) {
 			DEBUG << "EVFILT_READ";

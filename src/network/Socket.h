@@ -21,6 +21,16 @@ public:
 	Socket(int sockfd);
 	~Socket();
 
+	void reset() {
+		close();
+		sockfd_ = -1;
+	}
+
+	void reset(int sockfd) {
+		close();
+		sockfd_ = sockfd;
+	}
+
 	int fd() const { return sockfd_; }
 	void setFd(int sockfd) { sockfd_ = sockfd; }
 	bool available() const { return sockfd_ != -1 ? true : false; }
@@ -29,15 +39,18 @@ public:
 	int listen();
 	int accept(IpAddress* IpAddress);
 	int connect(const IpAddress& IpAddress);
+	void close();
 
 	void setNonBlock(bool on);
 	void setNoDelay(bool on);
 	void setReuseAddr(bool on);
 	void setReusePort(bool on);
 	void setKeepAlive(bool on);
-	void shutdownInput();
-	void shutdownOutput();
-	void shutdown();
+	void setLinger(bool on, int time_out);
+	
+	void shutdownReceive();
+	void shutdownSend();
+	void shutdownBoth();
 
 	static void closeSocket(int sockfd);
 	static int getSocket();

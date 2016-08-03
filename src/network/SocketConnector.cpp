@@ -45,6 +45,7 @@ void SocketConnector::run() {
 			handleErrorCallback();
 		}
 	} 
+	
 	if (ret == 0) {
 		handler_->disableWrite();
 		IpAddress local_address;
@@ -52,8 +53,12 @@ void SocketConnector::run() {
 		DEBUG << "Local Address " << local_address.toString();
 		DEBUG << "Peer  Address " << peer_address_.toString();
 		Socket::getPeerAddress(socket_->fd(), &local_address);
-		ChannelPtr channelPtr(new Channel(event_loop_, socket_->fd(), local_address, peer_address_));
-		handleConnectCallback(channelPtr);
+
+		//ChannelPtr channelPtr(new Channel(event_loop_, socket_->fd(), local_address, peer_address_));
+		ChannelPtr channel_ptr = (static_cast<ChannelPool*> (event_loop_->getMutableContext()))
+								->acquire(event_loop_, socket_->fd(), local_address, peer_address_);
+
+		handleConnectCallback(channel_ptr);
 	}
 }
 
@@ -69,7 +74,11 @@ void SocketConnector::onWritable() {
 		DEBUG << "Peer  Address " << peer_address.toString();
 
 		if (!Socket::isSelfConnect(socket_->fd())) {
-			ChannelPtr channel_ptr(new Channel(event_loop_, socket_->fd(), local_address, peer_address));
+
+			//ChannelPtr channel_ptr(new Channel(event_loop_, socket_->fd(), local_address, peer_address));
+			ChannelPtr channel_ptr = (static_cast<ChannelPool*> (event_loop_->getMutableContext()))
+								->acquire(event_loop_, socket_->fd(), local_address, peer_address);
+
 			handleConnectCallback(channel_ptr);
 		} else {
 			int error;

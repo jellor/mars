@@ -85,9 +85,15 @@ void ThreadPool::runInThread() {
 			task = tasks_.front();
 			tasks_.pop();
 		}
-		DEBUG << "task.run()";
-		task.run();
-		DEBUG << "task.run() After";
+		
+		try {
+			DEBUG << "task.star()";
+			task.start();
+			DEBUG << "task.start() After";
+		} catch (...) {
+			DEBUG << "task.start() Error";
+		}
+		
 	}
 }
 

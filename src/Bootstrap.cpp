@@ -22,12 +22,13 @@ read_callback_(nullptr),
 write_callback_(nullptr),
 close_callback_(nullptr),
 error_callback_(nullptr),
-chain_list_()
+chain_factory_(nullptr)
 {
 	if (acceptor_count > 0) {
 		acceptor_ = new Acceptor(listen_address_list, acceptor_count, worker_count);
 		acceptor_->setFilterCallback(std::bind(&Bootstrap::handleFilter, 
 			this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+		acceptor_->setConnectCallback(std::bind(&Bootstrap::handleConnect, this, std::placeholders::_1));
 		acceptor_->setReadCallback(std::bind(&Bootstrap::handleRead, this, std::placeholders::_1));
 		acceptor_->setCloseCallback(std::bind(&Bootstrap::handleClose, this, std::placeholders::_1));
 		acceptor_->setWriteCallback(std::bind(&Bootstrap::handleWrite, this, std::placeholders::_1));
@@ -67,19 +68,7 @@ void Bootstrap::start() {
 void Bootstrap::join() {
 	acceptor_->join();
 	connector_->join();
-}
-
-void Bootstrap::addChain(HandlerChain* channel_chain) {
-		chain_list_.push_back(channel_chain);
-}
-
-HandlerChain* Bootstrap::activeHandlerChain(const ChannelPtr& channel_ptr) const {
-	for (int i = 0; i < chain_list_.size(); i ++) {
-		if (chain_list_[i]->available(channel_ptr)) {
-			return chain_list_[i];
-		}
-	}
-	return nullptr;
+	DEBUG << "Join";
 }
 
 bool Bootstrap::handleFilter(int fd, const IpAddress& local_address, const IpAddress& peer_address) {
@@ -96,17 +85,26 @@ void Bootstrap::handleConnect(const ChannelPtr& channel_ptr) {
 	if (connect_callback_ != nullptr) {
 		connect_callback_(channel_ptr);
 	}
+
+	if (chain_factory_ != nullptr) {
+		HandlerChain* handler_chain = chain_factory_(channel_ptr);
+		if (handler_chain != nullptr) {
+			channel_ptr->setHandlerChain(handler_chain);
+			handler_chain->fireActive(channel_ptr, nullptr);
+		}
+	}	
 }
 
 void Bootstrap::handleRead(const ChannelPtr& channel_ptr) {
 	DEBUG << "Handle Read";
+
 	if (read_callback_ != nullptr) {
 		read_callback_(channel_ptr);
 	}
 	
-	HandlerChain* handler_chain = activeHandlerChain(channel_ptr);
+	HandlerChain* handler_chain = channel_ptr->getChain();
 	if (handler_chain != nullptr) {
-		handler_chain->doInHandler(channel_ptr, nullptr);
+		handler_chain->fireReceive(channel_ptr, nullptr);
 	}
 	
 	// while (protobufCodec_.valid(channelPtr->getInBuffer())) {
@@ -120,13 +118,20 @@ void Bootstrap::handleRead(const ChannelPtr& channel_ptr) {
 
 void Bootstrap::handleClose(const ChannelPtr& channel_ptr) {
 	DEBUG << "Handle Close";
+
 	if (close_callback_ != nullptr) {
 		close_callback_(channel_ptr);
+	}
+
+	HandlerChain* handler_chain = channel_ptr->getChain();
+	if (handler_chain != nullptr) {
+		handler_chain->fireInactive(channel_ptr);
 	}
 }
 
 void Bootstrap::handleWrite(const ChannelPtr& channel_ptr) {
 	DEBUG << "Handle Write";
+
 	if (write_callback_ != nullptr) {
 		write_callback_(channel_ptr);
 	}
@@ -134,8 +139,14 @@ void Bootstrap::handleWrite(const ChannelPtr& channel_ptr) {
 
 void Bootstrap::handleError(const ChannelPtr& channel_ptr) {
 	DEBUG << "Handle Error";
+
 	if (error_callback_ != nullptr) {
 		error_callback_(channel_ptr);
+	}
+
+	HandlerChain* handler_chain = channel_ptr->getChain();
+	if (handler_chain != nullptr) {
+		handler_chain->fireError(channel_ptr);
 	}
 }
 

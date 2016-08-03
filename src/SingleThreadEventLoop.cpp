@@ -9,13 +9,13 @@
 
 #include "SingleThreadEventLoop.h"
 #include "Log.h"
+#include "ChannelPool.h"
 
 using namespace mars;
 
 SingleThreadEventLoop::SingleThreadEventLoop():
-started(false),
+started_(false),
 thread_(),
-channel_ptr_set_(nullptr),
 event_loop_(nullptr)
 {
 
@@ -26,7 +26,7 @@ SingleThreadEventLoop::~SingleThreadEventLoop() {
 }
 
 void SingleThreadEventLoop::setThreadName(const std::string& name) {
-	if (started) {
+	if (started_) {
 		return ;
 	}
 	thread_.setThreadName(name);
@@ -35,8 +35,8 @@ void SingleThreadEventLoop::setThreadName(const std::string& name) {
 void SingleThreadEventLoop::start() {
 	thread_.setThreadFunc(std::bind(&SingleThreadEventLoop::runInThread, this));
 	thread_.start();
-	while (event_loop_ == nullptr) {}
-	started = true;
+	while (started_ == false) {} // ? lock
+	//assert(started_ == true);
 }
 
 bool SingleThreadEventLoop::join() {
@@ -48,11 +48,19 @@ EventLoop* SingleThreadEventLoop::getEventLoop() const {
 }
 
 void SingleThreadEventLoop::runInThread() {
-	channel_ptr_set_ = new std::set<ChannelPtr>();
-	event_loop_      = new EventLoop();
-	event_loop_->setContext(channel_ptr_set_);
+
+	event_loop_      			= new EventLoop();
+	ChannelPool* channel_pool	= new ChannelPool(event_loop_);
+	event_loop_->setContext(channel_pool);
+
+	started_ = true;
+
 	event_loop_->start();
-	channel_ptr_set_->clear();
-	delete channel_ptr_set_;
+
 	delete event_loop_;
+	delete channel_pool;
+	event_loop_		 = nullptr;
+	channel_pool	 = nullptr;
+	started_ 		 = false;
 }
+

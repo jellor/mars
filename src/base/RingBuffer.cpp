@@ -43,7 +43,11 @@ size_(0)
 }
 
 RingBuffer::~RingBuffer() {
-	if (buffer_ != NULL) free(buffer_);
+	DEBUG << "RingBuffer Destructor ...";
+	if (buffer_ != NULL) {
+		DEBUG << "Free buffer_";
+		free(buffer_);
+	}
 }
 
 int RingBuffer::read(int sockfd) { // ? can loop read()

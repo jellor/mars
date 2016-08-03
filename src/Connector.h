@@ -20,12 +20,13 @@
 namespace mars {
 
 class Connector : public NonCopyable {
-	typedef std::function<void(ChannelPtr)> EventCallback;
+	typedef std::function<void(const ChannelPtr&)> EventCallback;
 public:
 	Connector(const std::vector<IpAddress*>& ip_address_list);
 	~Connector();
 
 	void start();
+	void connect(const IpAddress& remote_address);
 	void join();
 	bool started() const { return started_; }
 	void setConnectCallback(const EventCallback& cb) { connect_callback_ = cb; }
@@ -55,13 +56,13 @@ private:
 		if (error_callback_ != nullptr) error_callback_(channel_ptr);
 	}
 	void runInThread();
-	void handleConnectEvent(ChannelPtr channel_ptr);
+	void handleConnectEvent(const ChannelPtr& channel_ptr);
 
 	std::atomic<bool> started_;
 	EventLoop* event_loop_;
 	std::vector<IpAddress*> ip_address_list_;
 	std::vector<SocketConnector*> socket_connector_list_;
-	std::set<ChannelPtr> channel_ptr_set_;
+
 	Thread thread_;
 	EventCallback connect_callback_;
 	EventCallback read_callback_;

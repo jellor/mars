@@ -8,6 +8,7 @@
  *=======================================================*/
 
 #include "Handler.h"
+#include "Log.h"
 
 using namespace mars;
 
@@ -26,6 +27,7 @@ error_callback_(nullptr)
 }
 
 Handler::~Handler() {
+	DEBUG << "Handler Destructor ...";
 	readable_ = false;
 	writable_ = false;
 	remove();
@@ -61,6 +63,8 @@ void Handler::remove() {
 	if (status_ == ADD) {
 		event_loop_->removeHandler(this);
 	}
+	readable_ = false;
+	writable_ = false;
 }
 void Handler::update() {
 	if ((status_ == NEW || status_ == DEL) && (isReadable() || isWritable())) {

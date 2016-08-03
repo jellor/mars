@@ -176,3 +176,4 @@ void MinHeap<T>::shiftDown(unsigned int holeIndex, T* element) {
 }
 
 #endif
+

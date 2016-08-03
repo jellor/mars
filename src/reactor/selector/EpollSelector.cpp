@@ -29,9 +29,11 @@ EpollSelector::~EpollSelector() {
 void EpollSelector::dispatch(int64_t timeout_usec) {
 	int active_count = 0;
 	active_count = epoll_wait(epfd_, &*active_event_list_.begin(), active_event_list_.size(), timeout_usec / 1000);
+
 	if (active_count < 0) {
 		WARN << "Epoll Wait Failed";
 	}
+
 	for (int i = 0; i < active_count; i ++) {
 		Handler* active_handler = (Handler*) active_event_list_[i].data.ptr;
 		struct epoll_event& active_event = active_event_list_[i];
@@ -41,10 +43,10 @@ void EpollSelector::dispatch(int64_t timeout_usec) {
 		}
 		if (active_event.events & EPOLLHUP) {
 			DEBUG << "EPOLLHUP";
-			active_handler->handleCloseEvent();
 		}
 		if (active_event.events & EPOLLRDHUP) {
 			DEBUG << "EPOLLRDHUP";
+			active_handler->handleCloseEvent();
 			active_handler->handleReadEvent();
 		}
 		if (active_event.events & EPOLLPRI) {
@@ -59,6 +61,7 @@ void EpollSelector::dispatch(int64_t timeout_usec) {
 			active_handler->handleWriteEvent();
 		}
 	}
+
 	if (active_count == active_event_list_.size()) {
 		active_event_list_.resize(active_event_list_.size() * 2);
 	}

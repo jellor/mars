@@ -10,6 +10,7 @@
 #ifndef __IP_ADDRESS_H__
 #define __IP_ADDRESS_H__
 
+#include "Log.h"
 #include <string>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -23,6 +24,8 @@ public:
 	IpAddress(uint16_t port, bool isLoopback = true);
 	IpAddress(): IpAddress(0) {}
 	IpAddress(const struct sockaddr_in& addr): addr_(addr) {};
+
+	~IpAddress() { DEBUG << "IpAddress Destructor ..."; }
 
 	uint16_t port() const;
 	std::string ip() const;

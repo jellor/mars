@@ -21,6 +21,9 @@
 namespace mars {
 
 class Bootstrap : public NonCopyable {
+
+	typedef std::function<HandlerChain* (const ChannelPtr&)> ChainFactory;
+
 public:
 	Bootstrap(const std::vector<IpAddress*>& listen_address_list, const std::vector<IpAddress*>& connect_address_list, 
 	int acceptor_count, int worker_count, int worker_thread_count);
@@ -29,8 +32,6 @@ public:
 	void start();
 	void join();
 
-	void addChain(HandlerChain* channel_chain);
-
 	void setFilterCallback(const FilterCallback& cb) { filter_callback_  = cb; }
 	void setConnectCallback(const EventCallback& cb) { connect_callback_ = cb; }
 	void setReadCallback(const EventCallback& cb) 	 { read_callback_    = cb; }
@@ -38,9 +39,11 @@ public:
 	void setCloseCallback(const EventCallback& cb)   { close_callback_ = cb;   }
 	void setErrorCallback(const EventCallback& cb)   { error_callback_ = cb;   }
 
-private:
+	void setChainFactory(const ChainFactory& factory) { 
+		chain_factory_ = factory;
+	}
 
-	HandlerChain* activeHandlerChain(const ChannelPtr& channel_ptr) const;
+private:
 
 	bool handleFilter(int fd, const IpAddress& local_address, const IpAddress& peer_address);
 	void handleConnect(const ChannelPtr& channel_ptr);
@@ -60,7 +63,7 @@ private:
 	EventCallback close_callback_;
 	EventCallback error_callback_;
 
-	std::vector<HandlerChain*> chain_list_;
+	ChainFactory chain_factory_;
 };
 
 

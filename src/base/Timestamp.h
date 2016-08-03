@@ -27,6 +27,14 @@ private:
 	int64_t usec_;
 };
 
+// Timestamp operator + (const Timestamp& lhs, const Timestamp& rhs) {
+// 	return Timestamp(lhs.macrosecond() + rhs.macrosecond());
+// }
+
+// Timestamp operator - (const Timestamp& lhs, const Timestamp& rhs) {
+// 	return Timestamp(lhs.macrosecond() - rhs.macrosecond());
+// }
+
 }
 
 #endif

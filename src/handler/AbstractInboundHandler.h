@@ -20,10 +20,10 @@ public:
 	AbstractInboundHandler();
 	virtual ~AbstractInboundHandler();
 
-	virtual void onRead(ChannelPtr channel_ptr, void* object) = 0;
-	virtual void onError(ChannelPtr channel_ptr) 			  = 0;
-
-	void handle(ChannelPtr channel_ptr, void* object) override;
+	virtual void onActive(const ChannelPtr& channel_ptr)				= 0;
+	virtual void onReceive(const ChannelPtr& channel_ptr, void* object) = 0;
+	virtual void onInactive(const ChannelPtr& channel_ptr)				= 0;
+	virtual void onError(const ChannelPtr& channel_ptr) 			    = 0;
 
 	void setNext(AbstractInboundHandler* next);
 	AbstractInboundHandler* getNext() const;

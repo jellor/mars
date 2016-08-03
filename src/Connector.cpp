@@ -18,7 +18,6 @@ started_(false),
 event_loop_(nullptr),
 ip_address_list_(ip_address_list),
 socket_connector_list_(),
-channel_ptr_set_(),
 thread_(),
 connect_callback_(nullptr),
 read_callback_(nullptr),
@@ -44,36 +43,57 @@ void Connector::start() {
 	thread_.setThreadFunc(std::bind(&Connector::runInThread, this));
 	thread_.setThreadName("Connector Thread");
 	thread_.start();
-	while (event_loop_ == nullptr) {}
-	started_ = true;
+
+	while (started_ == false) {}
+
 	for (int i = 0; i < ip_address_list_.size(); i ++) {
 		SocketConnector* element = new SocketConnector(event_loop_, *ip_address_list_[i]);
-		element->connect();
 		element->setConnectCallback(std::bind(&Connector::handleConnectEvent, this, std::placeholders::_1));
+		element->connect();
+		//element->setConnectCallback(std::bind(&Connector::handleConnectEvent, this, std::placeholders::_1));
 		socket_connector_list_.push_back(element);
 	}
+}
+
+void Connector::connect(const IpAddress& remote_address) {
+	SocketConnector* element = new SocketConnector(event_loop_, remote_address);
+	element->setConnectCallback(std::bind(&Connector::handleConnectEvent, this, std::placeholders::_1));
+	element->connect();
+	//element->setConnectCallback(std::bind(&Connector::handleConnectEvent, this, std::placeholders::_1));
+	socket_connector_list_.push_back(element);
 }
 
 void Connector::join() {
 	thread_.join();
 }
 
-void Connector::handleConnectEvent(ChannelPtr channel_ptr) {
+void Connector::handleConnectEvent(const ChannelPtr& channel_ptr) {
 	DEBUG << "Handle Connect Event";
-	channel_ptr_set_.insert(channel_ptr);
+
 	handleConnect(channel_ptr);
 	//channel_ptr->setConnectCallback(std::bind(&Connector::handleConnect, this, channel_ptr));
-	channel_ptr->setReadCallback(std::bind(&Connector::handleRead,   this, channel_ptr));
-	channel_ptr->setCloseCallback(std::bind(&Connector::handleClose, this, channel_ptr));
-	channel_ptr->setWriteCallback(std::bind(&Connector::handleWrite, this, channel_ptr));
-	channel_ptr->setErrorCallback(std::bind(&Connector::handleError, this, channel_ptr));
+	channel_ptr->setReadCallback(std::bind(&Connector::handleRead,   this, std::placeholders::_1));
+	channel_ptr->setCloseCallback(std::bind(&Connector::handleClose, this, std::placeholders::_1));
+	channel_ptr->setWriteCallback(std::bind(&Connector::handleWrite, this, std::placeholders::_1));
+	channel_ptr->setErrorCallback(std::bind(&Connector::handleError, this, std::placeholders::_1));
+
+	// channel_ptr->getHandler()->enableRead();
 }
 
 void Connector::runInThread() {
-	event_loop_ = new EventLoop();
+	event_loop_      			= new EventLoop();
+	ChannelPool* channel_pool	= new ChannelPool(event_loop_);
+	event_loop_->setContext(channel_pool);
+
+	started_ = true;
+
 	event_loop_->start();
+
 	delete event_loop_;
-	event_loop_  = nullptr;
+	delete channel_pool;
+	event_loop_		 = nullptr;
+	channel_pool	 = nullptr;
+	started_ 		 = false;
 }
 
 

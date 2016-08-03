@@ -7,32 +7,45 @@
  *
  *=======================================================*/
 
-#include "AbstractInboundHandler.h"
-#include "AbstractOutboundHandler.h"
-
 #ifndef __HANDLER_CHAIN_H__
 #define __HANDLER_CHAIN_H__
 
+#include "AbstractInboundHandler.h"
+#include "AbstractOutboundHandler.h"
+#include "HandlerContext.h"
 
 namespace mars {
 
 class HandlerChain {
-
-	typedef std::function<bool(const ChannelPtr&)> AvailableCallback;
-
 public:
 	HandlerChain();
 	~HandlerChain();
 
-	void doInHandler(ChannelPtr channel_ptr, void* object);
-	void doOutHandler(ChannelPtr channel_ptr, void* object);
-
 	void addInHandler(AbstractInboundHandler* handler);
 	void addOutHandler(AbstractOutboundHandler* handler);
 
-	bool available(const ChannelPtr& channel_ptr) const;
+	void onRegistered(ChannelPtr channel_ptr, void* object);
+	void onUnregistered(ChannelPtr channel_ptr, void* object);
 
-	void setAvailableCallback(const AvailableCallback& available_cb) { available_callback_ = available_cb; }
+	void fireActive(const ChannelPtr& channel_ptr, void* object);
+	void fireReceive(const ChannelPtr& channel_ptr, void* object);
+	void fireInactive(const ChannelPtr& channel_ptr);
+	void fireError(const ChannelPtr& channel_ptr);
+
+	void onReadComplete(ChannelPtr channel_ptr, void* object);
+	void onWritablilityChanged(ChannelPtr channel_ptr, void* object);
+
+	void doRead(void* object);
+	void send(const ChannelPtr& channel_ptr, void* object);
+	void send(const ChannelPtr& channel_ptr, char* data, int len);
+	void sendTo(const ChannelPtr& channel_ptr, void* object);
+	void doBind(void* object);
+	void connect(const IpAddress& remote_address);
+	void doDisconnect(void* object);
+	void shutdownReceive(const ChannelPtr& channel_ptr);
+	void shutdownSend(const ChannelPtr& channel_ptr);
+	void close(const ChannelPtr& channel_ptr);
+	void doUnregister(void* object);
 
 private:
 	AbstractInboundHandler* in_handler_chain_head_;
@@ -40,7 +53,8 @@ private:
 	AbstractOutboundHandler* out_handler_chain_head_;
 	AbstractOutboundHandler* out_handler_chain_tail_;
 
-	AvailableCallback available_callback_;
+	AbstractOutboundHandler* sink_handler_;
+	//HandlerContext handler_context_;
 };
 
 }

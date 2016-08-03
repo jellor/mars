@@ -18,16 +18,9 @@ next_(nullptr)
 }
 
 AbstractOutboundHandler::~AbstractOutboundHandler() {
+	DEBUG << "AbstractOutboundHandler Destructor ...";
 	if (next_ != nullptr) {
 		delete next_;
-	}
-}
-
-void AbstractOutboundHandler::handle(ChannelPtr channel_ptr, void* object) {
-	try {
-		onWrite(channel_ptr, object);
-	} catch (...) {
-		onError(channel_ptr);
 	}
 }
 

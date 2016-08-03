@@ -19,10 +19,48 @@ public:
 	InboundHandlerAdapter() 		 = default;
 	virtual ~InboundHandlerAdapter() = default;
 
-	virtual void onRead(ChannelPtr channel_ptr, void* object) override {}
-	virtual void onError(ChannelPtr channel_ptr) 			  override {}
+	virtual void onActive(const ChannelPtr& channel_ptr) override {
+
+		AbstractInboundHandler* next = getNext();
+
+		if (next != nullptr) {
+			next->onActive(channel_ptr);
+		}
+
+	}
+
+	virtual void onReceive(const ChannelPtr& channel_ptr, void* object) override {
+
+		AbstractInboundHandler* next = getNext();
+
+		if (next != nullptr) {
+			next->onReceive(channel_ptr, object);
+		}
+
+	}
+
+	virtual void onInactive(const ChannelPtr& channel_ptr) override {
+
+		AbstractInboundHandler* next = getNext();
+
+		if (next != nullptr) {
+			next->onInactive(channel_ptr);
+		}
+
+	}
+
+	virtual void onError(const ChannelPtr& channel_ptr) override {
+
+		AbstractInboundHandler* next = getNext();
+
+		if (next != nullptr) {
+			next->onError(channel_ptr);
+		}
+
+	}
 };
 
 }
 
 #endif
+

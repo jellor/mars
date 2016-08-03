@@ -18,16 +18,19 @@ typedef std::function<void(void)> TaskCallback;
 
 class Task {
 public:
-	Task(const TaskCallback& cb = nullptr): taskCb_(cb) {}
-	virtual void run() { if (taskCb_ != nullptr) taskCb_(); }
-
+	Task(const TaskCallback& cb = nullptr): task_callback_(cb) {}
 	Task(const Task& rhs) {
-		taskCb_ = rhs.taskCb_;
+		task_callback_ = rhs.task_callback_;
 		DEBUG << "Task Copy Constructor";
 	}
+	virtual ~Task() = default;
+
+	void start() { if (task_callback_ != nullptr) task_callback_(); run(); }
+	virtual void run() {}
 
 private:
-	TaskCallback taskCb_;
+	TaskCallback task_callback_;
+
 };
 
 }

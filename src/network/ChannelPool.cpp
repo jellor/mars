@@ -8,13 +8,23 @@
  *=======================================================*/
 
 #include "ChannelPool.h"
+#include "Log.h"
 
 using namespace mars;
 
-ChannelPool::ChannelPool():
-deque_()
+ChannelPool::ChannelPool(EventLoop* event_loop):
+event_loop_(event_loop),
+deque_(),
+channel_ptr_set_()
 {
 
+}
+
+ChannelPool::ChannelPool(EventLoop* event_loop, int size):
+event_loop_(event_loop),
+deque_(),
+channel_ptr_set_()
+{
 }
 
 ChannelPool::~ChannelPool() {
@@ -27,20 +37,46 @@ ChannelPool::~ChannelPool() {
 
 ChannelPtr ChannelPool::acquire(EventLoop* event_loop, int sockfd, const IpAddress& local_address, const IpAddress& peer_address) {
 	if (deque_.empty()) {
-		ChannelPtr channelPtr(new Channel(event_loop, sockfd, local_address, peer_address), [this] (Channel* p) {
+		ChannelPtr channel_ptr(new Channel(event_loop, sockfd, local_address, peer_address), [this] (Channel* p) {
+			DEBUG << "Release Channel";
 			p->reset();
 			deque_.push_front(p);
 		});
-		return channelPtr;
+		channel_ptr_set_.insert(channel_ptr);
+		//channel_ptr->reset(event_loop, sockfd, local_address, peer_address);
+		return channel_ptr;
 	} else {
 		Channel* ptr = deque_.front();
-		ptr->setEventLoop(event_loop);
-		ptr->setSocket(sockfd);
-		ChannelPtr channelPtr(ptr, [this] (Channel* p) {
+		
+		ChannelPtr channel_ptr(ptr, [this] (Channel* p) {
+			DEBUG << "Release Channel";
 			p->reset();
 			deque_.push_front(p);
 		});
 		deque_.pop_front();
-		return channelPtr;
+		channel_ptr_set_.insert(channel_ptr);
+
+		channel_ptr->reset(event_loop, sockfd, local_address, peer_address);
+
+		return channel_ptr;
 	}
 }
+
+void ChannelPool::release(const ChannelPtr& channel_ptr) {
+	std::set<ChannelPtr>::const_iterator it =  channel_ptr_set_.find(channel_ptr);
+	DEBUG << "Deque Count = > " << size();
+	DEBUG << "Set Count = > " << channel_ptr_set_.size();
+	DEBUG << "Use Count = > " << channel_ptr.use_count();
+	if (it != channel_ptr_set_.end()) {
+		channel_ptr_set_.erase(it);
+	}
+	DEBUG << "Use Count = > " << channel_ptr.use_count();
+	DEBUG << "Set Count = > " << channel_ptr_set_.size();
+	DEBUG << "Deque Count = > " << size();
+}
+
+	
+
+
+
+

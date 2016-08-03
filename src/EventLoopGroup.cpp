@@ -9,6 +9,7 @@
 
 #include "EventLoopGroup.h"
 #include "Thread.h"
+#include "ChannelPool.h"
 #include "Log.h"
 
 using namespace mars;
@@ -66,24 +67,15 @@ SingleThreadEventLoop* EventLoopGroup::getThread(int index) {
 ChannelPtr EventLoopGroup::push(int fd, const IpAddress& local_address, const IpAddress& peer_address) {
 	EventLoop* event_loop = next();
 	if (event_loop == nullptr) return nullptr;
-	ChannelPtr channel_ptr(new Channel(event_loop, fd, local_address, peer_address));
-	event_loop->doFunc(std::bind(&EventLoopGroup::runInEventLoop, this, channel_ptr));
+
+	//ChannelPtr channel_ptr(new Channel(event_loop, fd, local_address, peer_address));
+
+	ChannelPtr channel_ptr = (static_cast<ChannelPool*> (event_loop->getMutableContext()))
+								->acquire(event_loop, fd, local_address, peer_address);
+	
 	return channel_ptr;
 }
 
-void EventLoopGroup::runInEventLoop(ChannelPtr channel_ptr) {
-	DEBUG << "........................";
-	DEBUG << "Thread Name " << Thread::getCurrentThreadName();
-	DEBUG << "Fd " << channel_ptr->getSocket()->fd();
-	DEBUG << "Local Address " << channel_ptr->getLocalAddress().toString();
-	DEBUG << "Peer  Address " << channel_ptr->getPeerAddress().toString();
-	//ChannelHandlerPtr channelHandlerPtr(new ChannelHandler(event_loop, fd, localAddr, peerAddr));
-	(static_cast<std::set<ChannelPtr>*>(channel_ptr->getEventLoop()->getMutableContext()))
-		->insert(channel_ptr);
-	DEBUG << "ChannelSet Size " << (static_cast<std::set<ChannelPtr>*>(channel_ptr
-								->getEventLoop()->getMutableContext()))->size();
-	DEBUG << "........................";
-}
 
 
 

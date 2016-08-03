@@ -9,6 +9,7 @@
 
 #include "Socket.h"
 #include "Log.h"
+#include <errno.h>
 #include <sys/socket.h>
 #include <fcntl.h>
 #include <netinet/tcp.h>
@@ -42,7 +43,9 @@ sockfd_(sockfd)
 
 Socket::~Socket() {
 	DEBUG << "Socket Fd -> " << sockfd_ << " Closing ...";
-	close(sockfd_);
+	if (sockfd_ != -1) {
+		::close(sockfd_);
+	}
 }
 
 int Socket::bind(const IpAddress& IpAddress) {
@@ -68,6 +71,17 @@ int Socket::accept(IpAddress* IpAddress) {
 int Socket::connect(const IpAddress& IpAddress) {
 	int ret = ::connect(sockfd_, reinterpret_cast<const struct sockaddr*>(&IpAddress.getAddr()), sizeof(struct sockaddr_in));
 	return ret;
+}
+
+void Socket::close() {
+	DEBUG << "fd =====> " << sockfd_;
+	DEBUG << "errno ======> " << errno;
+	if (sockfd_ != -1) {
+		::close(sockfd_);
+		sockfd_ = -1;
+	}
+	DEBUG << "fd =====> " << sockfd_;
+	DEBUG << "errno ======> " << errno;
 }
 
 void Socket::setNonBlock(bool on) {
@@ -115,20 +129,28 @@ void Socket::setKeepAlive(bool on) {
 	int ret = setsockopt(sockfd_, SOL_SOCKET, SO_KEEPALIVE, reinterpret_cast<char*>(&optval), sizeof(optval));
 }
 
-void Socket::shutdownInput() {
+void Socket::setLinger(bool on, int time_out) {
+
+}
+
+void Socket::shutdownReceive() {
 	::shutdown(sockfd_, SHUT_RD);
 }
 
-void Socket::shutdownOutput() {
+void Socket::shutdownSend() {
 	::shutdown(sockfd_, SHUT_WR);
 }
 
-void Socket::shutdown() {
+void Socket::shutdownBoth() {
 	::shutdown(sockfd_, SHUT_RDWR);
 }
 
 void Socket::closeSocket(int sockfd) {
-	close(sockfd);
+	DEBUG << "fd =====> " << sockfd;
+	DEBUG << "errno ======> " << errno;
+	::close(sockfd);
+	DEBUG << "fd =====> " << sockfd;
+	DEBUG << "errno ======> " << errno;
 }
 
 int Socket::getSocket() {
@@ -148,7 +170,7 @@ int Socket::getSocket() {
 
 int Socket::getError(int sockfd, int* error) {
 	socklen_t len = static_cast<socklen_t>(sizeof(error));
-	return getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &error, &len);
+	return getsockopt(sockfd, SOL_SOCKET, SO_ERROR, error, &len);
 }
 
 

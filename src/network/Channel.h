@@ -16,8 +16,11 @@
 #include "Handler.h"
 #include "Socket.h"
 #include <memory>
+#include <string>
 
 namespace mars {
+
+class HandlerChain;
 
 class Channel : public std::enable_shared_from_this<Channel> {
 
@@ -33,11 +36,16 @@ public:
 	void setCloseCallback(const EventCallback& cb)   { close_callback_ = cb;   }
 	void setErrorCallback(const EventCallback& cb)   { error_callback_ = cb;   }
 
-	bool isOpened() const { return opened_; }
+	bool isOpen() const { return opened_; }
 	void reset();
+	void reset(EventLoop* event_loop, int sockfd, const IpAddress& local_address, const IpAddress& peer_address);
+
+	void shutdownReceive();
+	void shutdownSend();
 	void close();
 
 	void metadata();
+	std::string toString() const;
 
 	void send(const RingBuffer* buffer); // TODO
 	void send(const char* data, unsigned int size);
@@ -49,8 +57,8 @@ public:
 	const IpAddress& getLocalAddress()  const { return local_address_; }
 	const IpAddress& getPeerAddress()   const { return peer_address_;  }
 
-	const RingBuffer* getOutBuffer() const { return &out_buffer_; }
-	const RingBuffer* getInBuffer()  const { return &in_buffer_;  }
+	//const RingBuffer* getOutBuffer() const { return &out_buffer_; }
+	//const RingBuffer* getInBuffer()  const { return &in_buffer_;  }
 
 	void setEventLoop(EventLoop* event_loop) {
 		event_loop_ = event_loop;
@@ -58,9 +66,7 @@ public:
 	}
 
 	void setSocket(int sockfd) {
-		socket_ = Socket(sockfd);
-		opened_ = true;
-		handler_.setFd(sockfd);	
+		socket_.reset(sockfd);
 	}
 
 	void setLocalAddress(const IpAddress& local_address) {
@@ -71,10 +77,23 @@ public:
 		peer_address_ = peer_address;
 	}
 
+
+
+	void setHandlerChain(HandlerChain* handler_chain) {
+		handler_chain_ = handler_chain;
+	}
+
+	HandlerChain* getChain() const {
+		return handler_chain_;
+	}
+
 private:
+	void shutdownReceiveInEventLoop();
+	void shutdownSendInEventLoop();
+	void closeInEventLoop();
 	int read(char* data, unsigned int size);
 	int write(const char* data, unsigned int size);
-	void runInEventLoop(const char* data, unsigned int size);
+	void sendInEventLoop(const char* data, unsigned int size);
 	void handleReadEvent();
 	void handleWriteEvent();
 
@@ -85,13 +104,16 @@ private:
 	Handler handler_;
 	RingBuffer out_buffer_;
 	RingBuffer in_buffer_;
-	bool opened_;
+
+	std::atomic<bool> opened_;
 
 	EventCallback connect_callback_;
 	EventCallback read_callback_;
 	EventCallback write_callback_;
 	EventCallback close_callback_;
 	EventCallback error_callback_;
+
+	HandlerChain* handler_chain_;
 
 };
 

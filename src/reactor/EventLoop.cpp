@@ -64,24 +64,32 @@ void EventLoop::stop() {
 }
 
 void EventLoop::loop() {
+
 	int64_t timeout;
 	int64_t now;
 	int64_t nextTimeout;
 	while (started_) {
+
 		timeout = 0;
 		now = Timestamp::now().macrosecond();
 		// ? not use lock
-		{
-			Lock lock(mutex_);
-			if (!heap_->empty()) {
+		// {
+		// 	Lock lock(mutex_);
+		// 	if (!heap_->empty()) {
+		// 		nextTimeout = (heap_->top())->timeout();
+		// 		timeout = nextTimeout > now ? nextTimeout - now : 0; 
+		// 	}
+		// }
+		if (!heap_->empty()) {
 				nextTimeout = (heap_->top())->timeout();
 				timeout = nextTimeout > now ? nextTimeout - now : 0; 
-			}
 		}
+
 		selector_->dispatch(timeout);
 		doTimeout(Timestamp::now().macrosecond());
 		doFuncs();
 	}
+	
 }
 
 

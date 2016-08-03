@@ -28,10 +28,17 @@ EpollSelector::~EpollSelector() {
 
 void EpollSelector::dispatch(int64_t timeout_usec) {
 	int active_count = 0;
-	active_count = epoll_wait(epfd_, &*active_event_list_.begin(), active_event_list_.size(), timeout_usec / 1000);
+
+	if (timeout_usec <= 0) {
+		active_count = epoll_wait(epfd_, &*active_event_list_.begin(), active_event_list_.size(), -1);
+	} else {
+		active_count = epoll_wait(epfd_, &*active_event_list_.begin(), active_event_list_.size(), timeout_usec / 1000);
+	}
 
 	if (active_count < 0) {
 		WARN << "Epoll Wait Failed";
+		WARN << "errno => " << errno;
+		WARN << "errno => " << Log::getError();
 	}
 
 	for (int i = 0; i < active_count; i ++) {

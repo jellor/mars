@@ -17,12 +17,12 @@ using namespace mars;
 SocketConnector::SocketConnector(EventLoop* event_loop, const IpAddress& peer_address):
 event_loop_(event_loop),
 peer_address_(peer_address),
-socket_(new Socket()),
-handler_(new Handler(event_loop_, socket_->fd())),
+socket_(),
+handler_(event_loop_, socket_.fd()),
 connect_callback_(nullptr),
 error_callback_(nullptr)
 {
-	socket_->setNoDelay(true);
+	socket_.setNoDelay(true);
 }
 
 SocketConnector::~SocketConnector() {
@@ -34,12 +34,19 @@ void SocketConnector::connect() {
 }
 
 void SocketConnector::run() {
-	int ret = socket_->connect(peer_address_);
+
+	int ret = socket_.connect(peer_address_);
+
 	int err = errno;
 	if (ret == -1) {
+		int sock_err;
+
+		DEBUG << "errno " << Log::getError();
+
 		if (err == EINPROGRESS || err == EINTR) {
-			handler_->setWriteCallback(std::bind(&SocketConnector::onWritable, this));
-			handler_->enableWrite();
+			errno = 0;
+			handler_.setWriteCallback(std::bind(&SocketConnector::onWritable, this));
+			handler_.enableWrite();
 		} else {
 			DEBUG << "Connect errno = > " << err;
 			handleErrorCallback();
@@ -47,51 +54,47 @@ void SocketConnector::run() {
 	} 
 	
 	if (ret == 0) {
-		handler_->disableWrite();
+		handler_.disableWrite();
 		IpAddress local_address;
-		DEBUG << "Fd => " << socket_->fd();
-		DEBUG << "Local Address " << local_address.toString();
-		DEBUG << "Peer  Address " << peer_address_.toString();
-		Socket::getPeerAddress(socket_->fd(), &local_address);
+		DEBUG << "Fd => " << socket_.fd() << "Local Address " << local_address.toString() << " Peer  Address " << peer_address_.toString();
+		Socket::getPeerAddress(socket_.fd(), &local_address);
 
-		//ChannelPtr channelPtr(new Channel(event_loop_, socket_->fd(), local_address, peer_address_));
+		//ChannelPtr channelPtr(new Channel(event_loop_, socket_.fd(), local_address, peer_address_));
 		ChannelPtr channel_ptr = (static_cast<ChannelPool*> (event_loop_->getMutableContext()))
-								->acquire(event_loop_, socket_->fd(), local_address, peer_address_);
+									->acquire(event_loop_, socket_.fd(), local_address, peer_address_);
 
 		handleConnectCallback(channel_ptr);
 	}
+
 }
 
 void SocketConnector::onWritable() {
 	IpAddress peer_address;
 	int error;
-	if (Socket::getPeerAddress(socket_->fd(), &peer_address)) {
-		handler_->disableWrite();
+	if (Socket::getPeerAddress(socket_.fd(), &peer_address)) {
+		handler_.disableWrite();
 		IpAddress local_address;
-		Socket::getLocalAddress(socket_->fd(), &local_address);
-		DEBUG << "Fd => " << socket_->fd();
-		DEBUG << "Local Address " << local_address.toString();
-		DEBUG << "Peer  Address " << peer_address.toString();
+		Socket::getLocalAddress(socket_.fd(), &local_address);
+		DEBUG << "Fd => " << socket_.fd() << " Local Address " << local_address.toString() << " Peer  Address " << peer_address.toString();
 
-		if (!Socket::isSelfConnect(socket_->fd())) {
+		if (!Socket::isSelfConnect(socket_.fd())) {
 
-			//ChannelPtr channel_ptr(new Channel(event_loop_, socket_->fd(), local_address, peer_address));
+			//ChannelPtr channel_ptr(new Channel(event_loop_, socket_.fd(), local_address, peer_address));
 			ChannelPtr channel_ptr = (static_cast<ChannelPool*> (event_loop_->getMutableContext()))
-								->acquire(event_loop_, socket_->fd(), local_address, peer_address);
+								->acquire(event_loop_, socket_.fd(), local_address, peer_address);
 
 			handleConnectCallback(channel_ptr);
 		} else {
 			int error;
-			if (Socket::getError(socket_->fd(), &error) != 0 || error != 0) {
+			if (Socket::getError(socket_.fd(), &error) != 0 || error != 0) {
 				WARN << Log::getError();
 			}
 			WARN << "Connect To Self";
 		}
 	} else {
-		DEBUG << "Fd => " << socket_->fd();
-		DEBUG << "Peer  Address " << peer_address.toString();
+		DEBUG << "Fd => " << socket_.fd() << " Peer  Address " << peer_address.toString();
 		handleErrorCallback();
-		handler_->remove();
+		handler_.remove();
 	}
 }
 

@@ -33,11 +33,11 @@ public:
 private:
 	void onAccept();
 
+	int null_fd_;
 	EventLoop* event_loop_;
 	IpAddress ip_address_;
 	Socket socket_;
 	Handler handler_;
-	int null_fd_;
 	AcceptCallback accept_callback_;	
 };
 

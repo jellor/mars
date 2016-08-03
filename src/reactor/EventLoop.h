@@ -67,7 +67,7 @@ private:
 	std::vector<Func> funcs_;
 	Mutex mutex_;
 	std::atomic<bool> calling_funcs_;
-	std::unique_ptr<MinHeap<Timer>> heap_;
+	MinHeap<Timer> heap_;
 
 	Handler* read_handler_;
 	Handler* write_handler_;

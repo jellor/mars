@@ -40,10 +40,8 @@ handler_chain_(nullptr)
 
 Channel::~Channel() {
 	DEBUG << "Channel Destructor ... ";
-	if (socket_.fd() != -1) {
-		Socket::closeSocket(socket_.fd());
-		socket_.setFd(-1);
-	}
+	
+	socket_.close();
 
 	if (handler_chain_ != nullptr) {
 		DEBUG << "Ok";
@@ -55,9 +53,12 @@ Channel::~Channel() {
 }
 
 void Channel::reset() {
+
 	event_loop_ = nullptr;
-	socket_.close();
 	handler_.reset();
+	socket_.close();
+	DEBUG << "errno => " << errno;
+	DEBUG << "errno => " << Log::getError();
 	out_buffer_.clear();
 	in_buffer_.clear();
 	opened_ 		  = false;
@@ -117,7 +118,8 @@ void Channel::close() {
 void Channel::closeInEventLoop() {
 	DEBUG << "Close In Event Loop";
 	opened_ = false;
-	socket_.close();
+
+	// socket_.close();
 
 	(static_cast<ChannelPool*> (event_loop_->getMutableContext()))
 		->release(shared_from_this());
@@ -234,25 +236,24 @@ void Channel::sendInEventLoop(const char* data, unsigned int size) {
 
 void Channel::handleReadEvent() {
 
-	DEBUG << "errno = > " << errno;
-	errno = 0;
-
 	int size = in_buffer_.read(socket_.fd());
-
-	DEBUG << "errno = > " << errno;
 	
 	if (size <= 0) {
 		// ? what happen
 		int error;
-		DEBUG << "errno = > " << errno;
-		errno = 0;
+		DEBUG << "errno => " << errno;
+		DEBUG << "errno => " << Log::getError();
+
 		int ret = Socket::getError(socket_.fd(), &error);
-		DEBUG << "Ret " << ret << " error " << error;
-		DEBUG << "errno = > " << errno;
+
 		DEBUG << "Receive Size => " << size;
 		if (close_callback_ != nullptr) {
 			close_callback_(shared_from_this());
 		}
+
+		DEBUG << "errno => " << errno;
+		DEBUG << "errno => " << Log::getError();
+
 	} else {
         DEBUG << "in_buffer Size " << in_buffer_.size() << " Capacity " << in_buffer_.capacity();
         if (read_callback_ != nullptr) {

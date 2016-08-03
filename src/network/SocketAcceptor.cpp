@@ -21,11 +21,11 @@ void defaultAcceptFunc(int fd, const IpAddress& local_address, const IpAddress& 
 }
 
 SocketAcceptor::SocketAcceptor(EventLoop* event_loop, const IpAddress& ip_address):
+null_fd_(open("/dev/null", O_CLOEXEC | O_WRONLY)),
 event_loop_(event_loop),
 ip_address_(ip_address),
 socket_(),
 handler_(event_loop, socket_.fd()),
-null_fd_(open("/dev/null", O_CLOEXEC | O_WRONLY)),
 accept_callback_(defaultAcceptFunc)
 {
 	socket_.setNoDelay(true);
@@ -53,12 +53,13 @@ void SocketAcceptor::listenInEventLoop() {
 void SocketAcceptor::onAccept() {
 	IpAddress peer_address; // ? object in stack
 	int fd = socket_.accept(&peer_address);
-	DEBUG << "fd == > " << fd;
 	if (fd != -1) {
 		accept_callback_(fd, ip_address_, peer_address);
 	} else {
+		WARN << "errno => " << Log::getError();
 		WARN << "Accept Errno => " << errno;
 		if (errno == ENOMEM) {
+			errno = 0;
 			close(null_fd_);
 			fd = ::accept(socket_.fd(), 0, 0);
 			close(fd);

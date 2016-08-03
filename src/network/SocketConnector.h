@@ -36,10 +36,7 @@ private:
 
 	void handleConnectCallback(const ChannelPtr& channel_ptr) { 
 		if (connect_callback_ != nullptr) {
-			DEBUG << "handle Connect Callback != nullptr ";
 			connect_callback_(channel_ptr); 
-		} else {
-			DEBUG << "handle ConnectCallback == nullptr";
 		}
 	}
 
@@ -49,8 +46,8 @@ private:
 
 	EventLoop* event_loop_;
 	IpAddress peer_address_;
-	std::unique_ptr<Socket> socket_;
-	std::unique_ptr<Handler> handler_; 
+	Socket socket_;
+	Handler handler_; 
 	ConnectCallback connect_callback_;
 	ErrorCallback error_callback_;
 };

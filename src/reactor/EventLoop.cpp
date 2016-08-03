@@ -23,7 +23,7 @@ context_(nullptr),
 selector_(Selector::newSelector()),
 funcs_(),
 calling_funcs_(false),
-heap_(new MinHeap<Timer>()),
+heap_(),
 read_handler_(nullptr),
 write_handler_(nullptr)
 {
@@ -41,7 +41,6 @@ EventLoop::~EventLoop() {
 
 void EventLoop::start() {
 	if (started_) {
-
 		return;
 	}
 
@@ -80,13 +79,16 @@ void EventLoop::loop() {
 		// 		timeout = nextTimeout > now ? nextTimeout - now : 0; 
 		// 	}
 		// }
-		if (!heap_->empty()) {
-				nextTimeout = (heap_->top())->timeout();
+
+		if (!heap_.empty()) {
+				nextTimeout = (heap_.top())->timeout();
 				timeout = nextTimeout > now ? nextTimeout - now : 0; 
 		}
 
 		selector_->dispatch(timeout);
+
 		doTimeout(Timestamp::now().macrosecond());
+
 		doFuncs();
 	}
 	
@@ -96,10 +98,10 @@ void EventLoop::loop() {
 void EventLoop::doTimeout(int64_t now) {
 	int64_t nextTimeout;
 	Timer* curTimer;	
-	while (!heap_->empty()) {
-		nextTimeout = (heap_->top())->timeout();
+	while (!heap_.empty()) {
+		nextTimeout = (heap_.top())->timeout();
 		if (nextTimeout > now) break;
-		curTimer = heap_->pop();
+		curTimer = heap_.pop();
 		curTimer->run();
 		if (curTimer->isValid()) {
 			doFunc(std::bind(&EventLoop::pushTimer, this, curTimer));
@@ -109,14 +111,17 @@ void EventLoop::doTimeout(int64_t now) {
 
 void EventLoop::doFuncs() {
 	calling_funcs_ = true;
+
 	std::vector<Func> funcs;
 	{
 		Lock lock(mutex_);
-		funcs_.swap(funcs);
+		funcs_.swap(funcs); // std::move().
 	}
+
 	for (size_t i = 0; i < funcs.size(); i ++) {
 		funcs[i]();
 	}
+
 	calling_funcs_ = false;
 }
 
@@ -132,11 +137,11 @@ void EventLoop::removeTimer(const TimerId& timerId) {
 }
 
 void EventLoop::pushTimer(Timer* timer) {
-	heap_->push(timer);
+	heap_.push(timer);
 }
 
 void EventLoop::eraseTimer(Timer* timer) {
-	heap_->erase(timer);
+	heap_.erase(timer);
 	delete timer;
 }
 
@@ -150,8 +155,9 @@ void EventLoop::doFunc(const Func& func) {
 
 void EventLoop::pushFunc(const Func& func) {
 	{
+		// ? TODO: lock free
 		Lock lock(mutex_);
-		funcs_.push_back(func);
+		funcs_.push_back(func); 
 	}
 	if (!isInSelfThread() || calling_funcs_) {
 		wakeup();

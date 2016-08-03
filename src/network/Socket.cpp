@@ -16,12 +16,15 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <sys/socket.h>
+#include <assert.h>
 
 using namespace mars;
 
 Socket::Socket():
 sockfd_(socket(AF_INET, SOCK_STREAM, 0))
 {
+	assert(sockfd_ > 0);
+	
 	setNonBlock(true);
 	int flags = fcntl(sockfd_, F_GETFD, 0);
 	flags |= FD_CLOEXEC;
@@ -69,19 +72,16 @@ int Socket::accept(IpAddress* IpAddress) {
 }
 
 int Socket::connect(const IpAddress& IpAddress) {
-	int ret = ::connect(sockfd_, reinterpret_cast<const struct sockaddr*>(&IpAddress.getAddr()), sizeof(struct sockaddr_in));
+	socklen_t len = static_cast<socklen_t>(sizeof(struct sockaddr_in));
+	int ret = ::connect(sockfd_, reinterpret_cast<const struct sockaddr*>(&IpAddress.getAddr()), len);
 	return ret;
 }
 
 void Socket::close() {
-	DEBUG << "fd =====> " << sockfd_;
-	DEBUG << "errno ======> " << errno;
 	if (sockfd_ != -1) {
 		::close(sockfd_);
 		sockfd_ = -1;
 	}
-	DEBUG << "fd =====> " << sockfd_;
-	DEBUG << "errno ======> " << errno;
 }
 
 void Socket::setNonBlock(bool on) {
@@ -146,11 +146,7 @@ void Socket::shutdownBoth() {
 }
 
 void Socket::closeSocket(int sockfd) {
-	DEBUG << "fd =====> " << sockfd;
-	DEBUG << "errno ======> " << errno;
 	::close(sockfd);
-	DEBUG << "fd =====> " << sockfd;
-	DEBUG << "errno ======> " << errno;
 }
 
 int Socket::getSocket() {

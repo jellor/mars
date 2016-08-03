@@ -69,8 +69,8 @@ build_bin() {
 
 	echo "cd "${BUILD_DIR}
 	cd ${BUILD_DIR}
-	echo "cmake ../sample"
-	cmake ../sample
+	echo "cmake ../samples"
+	cmake ../samples
 	echo "make"
 	make 
 	

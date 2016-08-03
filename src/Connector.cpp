@@ -68,10 +68,9 @@ void Connector::join() {
 }
 
 void Connector::handleConnectEvent(const ChannelPtr& channel_ptr) {
-	DEBUG << "Handle Connect Event";
 
 	handleConnect(channel_ptr);
-	//channel_ptr->setConnectCallback(std::bind(&Connector::handleConnect, this, channel_ptr));
+	// channel_ptr->setConnectCallback(std::bind(&Connector::handleConnect, this, channel_ptr));
 	channel_ptr->setReadCallback(std::bind(&Connector::handleRead,   this, std::placeholders::_1));
 	channel_ptr->setCloseCallback(std::bind(&Connector::handleClose, this, std::placeholders::_1));
 	channel_ptr->setWriteCallback(std::bind(&Connector::handleWrite, this, std::placeholders::_1));
@@ -84,7 +83,7 @@ void Connector::runInThread() {
 	event_loop_      			= new EventLoop();
 	ChannelPool* channel_pool	= new ChannelPool(event_loop_);
 	event_loop_->setContext(channel_pool);
-
+	
 	started_ = true;
 
 	event_loop_->start();

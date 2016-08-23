@@ -9,10 +9,11 @@
 
 #include "Base64.h"
 #include "Log.h"
+#include <limits>
 
 using namespace mars;
 
-const char Base64::encoding_table[64] = 
+const char Base64::encoding_table[64] =
 	{
 	/* 	 0    1	   2    3	 4	  5    6    7	*/
 		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
@@ -29,17 +30,17 @@ const char Base64::encoding_table[64] =
 	/* 	48   49	  50   51   52   53   54   55   */
 		'w', 'x', 'y', 'z', '0', '1', '2', '3',
 	/* 	56   57   58   59   60   61   62   63   */
-		'4', '5', '6', '7', '8', '9', '+', '/',  
+		'4', '5', '6', '7', '8', '9', '+', '/',
 	};
 
-const char Base64::decoding_table[128] = 
+const char Base64::decoding_table[128] =
 	{
 	/*null	   soh	   stx	   etx     eot     enq     ack     bel	 */
     	-1, 	-1, 	-1, 	-1, 	-1, 	-1, 	-1, 	-1,
-    /*  bs      ht      nl      vt      ff      cr      so      si   */	
+    /*  bs      ht      nl      vt      ff      cr      so      si   */
     	-1, 	-1, 	-1, 	-1, 	-1, 	-1, 	-1, 	-1,
     /* dle     dc1     dc2     dc3     dc4     nak     syn     etb   */
-    	-1, 	-1, 	-1, 	-1, 	-1, 	-1, 	-1, 	-1, 
+    	-1, 	-1, 	-1, 	-1, 	-1, 	-1, 	-1, 	-1,
     /* can      em     sub     esc      fs      gs      re      us   */
     	-1, 	-1, 	-1, 	-1, 	-1, 	-1, 	-1, 	-1,
     /*  sp       !       "       #       $       %       &       `   */
@@ -51,7 +52,7 @@ const char Base64::decoding_table[128] =
     /*   8       9       :       ;       <       =       >       ?   */
     	60, 	61, 	-1, 	-1, 	-1, 	-1, 	-1, 	-1,
     /*   @       A       B       C       D       E       F       G   */
-    	-1,  	 0,  	 1,  	 2,  	 3,  	 4,  	 5,  	 6, 
+    	-1,  	 0,  	 1,  	 2,  	 3,  	 4,  	 5,  	 6,
     /*   H       I       J       K       L       M       N       O   */
     	 7,  	 8,  	 9, 	10, 	11, 	12, 	13, 	14,
     /*   P       Q       R       S       T       U       V       W   */
@@ -63,7 +64,7 @@ const char Base64::decoding_table[128] =
     /*   h       i       j       k       l       m       n       o   */
     	33, 	34, 	35, 	36, 	37, 	38, 	39, 	40,
     /*   p       q       r       s       t       u       v       w   */
-    	41, 	42, 	43, 	44, 	45, 	46, 	47, 	48, 
+    	41, 	42, 	43, 	44, 	45, 	46, 	47, 	48,
     /*   x       y       z       {       |       }       ~     del   */
     	49, 	50, 	51, 	-1, 	-1, 	-1, 	-1, 	-1,
 	};
@@ -74,7 +75,7 @@ std::string Base64::encode(const std::string& binary_data) {
 	if (str_length > (std::numeric_limits<std::string::size_type>::max() / 4u) * 3u) {
 		return "";
 	}
-	
+
 	std::string ascii_data(((str_length + 2) / 3) * 4, '=');
 
 	int i  = 0;

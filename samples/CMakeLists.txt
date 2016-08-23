@@ -46,7 +46,7 @@ TARGET_LINK_LIBRARIES(Base64 mars)
 #指定生成目标
 ADD_EXECUTABLE(Channel Channel.cpp)
 #添加链接库, 相同于指定-l参数
-TARGET_LINK_LIBRARIES(Channel mars)
+TARGET_LINK_LIBRARIES(Channel mars pthread)
 
 #指定生成目标
 ADD_EXECUTABLE(ProtobufServer ProtobufServer.cpp)

@@ -9,6 +9,7 @@
  *=======================================================*/
 
 #include "BufferStream.h"
+#include "Log.h"
 
 using namespace mars;
 
@@ -49,7 +50,7 @@ bool BufferInputStream::Next(const void** data, int* size) {
 		// we're at the end of the buffer.
 		last_returned_size_ = 0; // Don't let caller back up.
 		return false;
-	}	
+	}
 }
 
 void BufferInputStream::BackUp(int count) {
@@ -106,6 +107,7 @@ bool BufferOutputStream::Next(void** data, int* size) {
 
 void BufferOutputStream::BackUp(int count) {
 	buffer_->backUpFromTail(count);
+	written_count_ -= count;
 }
 
 int64_t BufferOutputStream::ByteCount() const {

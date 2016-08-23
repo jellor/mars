@@ -44,7 +44,7 @@ size_(0)
 }
 
 RingBuffer::~RingBuffer() {
-	// DEBUG << "RingBuffer Destructor ...";
+	DEBUG << "RingBuffer Destructor ...";
 	if (buffer_ != NULL) {
 		// DEBUG << "Free buffer_";
 		free(buffer_);
@@ -61,8 +61,10 @@ int RingBuffer::read(int sockfd) { // ? can loop read()
 		iv[1].iov_base = buffer_;
 		iv[1].iov_len  = head_index;
 		size = ::readv(sockfd, iv, 2);
+        DEBUG << "readv" << size;
 	} else {
 		size = ::read(sockfd, buffer_ + tail_index, head_index - tail_index);
+		DEBUG << "read " << size;
 	}
 	tail_index = (tail_index + size) % capacity_;
 	size_      = size_ + size;
@@ -95,7 +97,7 @@ int RingBuffer::write(int sockfd) { // ? can loop write()
 
 int RingBuffer::read(char* data, unsigned int size) {
 	if (size_ == 0) return 0;
-	unsigned int resultSize = size > this->size_ ? this->size_ : size;	
+	unsigned int resultSize = size > this->size_ ? this->size_ : size;
 	if (head_index >= tail_index) {
 		unsigned int len = capacity_ - head_index;
 		memcpy(data, buffer_ + head_index, len);
@@ -103,17 +105,17 @@ int RingBuffer::read(char* data, unsigned int size) {
 	} else {
 		memcpy(data, buffer_ + head_index, resultSize);
 	}
-	head_index = (head_index + resultSize) % capacity_; // ? 
+	head_index = (head_index + resultSize) % capacity_; // ?
 	size_ 	   = size_ - resultSize;
 	return resultSize;
 }
 
 int RingBuffer::write(const char* data, unsigned int size) {
-	if (unused() < size) { 
-		resize(capacity_ + size); 
+	if (unused() < size) {
+		resize(capacity_ + size);
 	}
 	unsigned int len = capacity_ - tail_index;
-	if (size > len) {		
+	if (size > len) {
 		memcpy(buffer_ + tail_index, data, len);
 		memcpy(buffer_, data + len, size - len);
 	} else {
@@ -126,11 +128,11 @@ int RingBuffer::write(const char* data, unsigned int size) {
 
 void RingBuffer::resize(unsigned int size) {
 	int tmpSize = capacity_ << 1; // ? tempSize != capacity_
-	int newSize = tmpSize > size ? tmpSize : size; 
+	int newSize = tmpSize > size ? tmpSize : size;
 	buffer_ = static_cast<char*>(realloc(buffer_, newSize));
 	if (buffer_ == NULL) {
 
-	} else {	
+	} else {
 		if (head_index  == tail_index && size_ == 0) {
 			head_index = 0;
 			tail_index = 0;

@@ -123,6 +123,7 @@ private:
 	void closeInEventLoop();
 	int read(char* data, unsigned int size);
 	int write(const char* data, unsigned int size);
+	void sendBufferInEventLoop(const RingBuffer* buffer);
 	void sendInEventLoop(const char* data, unsigned int size);
 	void handleReadEvent();
 	void handleWriteEvent();

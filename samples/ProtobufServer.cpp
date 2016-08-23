@@ -25,10 +25,21 @@ public:
         int len       = query->len();
         DEBUG << "type name " << query->type_name();
         DEBUG << "len " << query->len();
+
+        DEBUG << "Message size " << query->ByteSize() << " Message name " << query->GetTypeName();
+
         query->set_type_name(++type_name);
         query->set_len(++len);
+
+
+        DEBUG << "Message size " << query->ByteSize() << " Message name " << query->GetTypeName();
+
         sendMessage(query, channel_ptr);
-        delete message;
+
+
+
+        query->Clear();
+        delete query;
 	}
 	virtual const std::string getName() override {
 		return "DefaultHandler";
@@ -37,8 +48,8 @@ public:
 
 class Server {
 public:
-	Server(const std::vector<IpAddress>& listen_address_list, const std::vector<IpAddress>& connect_address_list, 
-		int acceptor_count, int worker_count, int worker_thread_count): 
+	Server(const std::vector<IpAddress>& listen_address_list, const std::vector<IpAddress>& connect_address_list,
+		int acceptor_count, int worker_count, int worker_thread_count):
 		bootstrap_(listen_address_list, connect_address_list, acceptor_count, worker_count, worker_thread_count)
 	{
 		DEBUG << "Server Constructor ...";
@@ -60,7 +71,7 @@ public:
 		});
 
 		bootstrap_.start();
-		bootstrap_.join();	
+		bootstrap_.join();
 	}
 
 private:

@@ -34,6 +34,10 @@ IpAddress::IpAddress(uint16_t port, bool isLoopback) {
 	addr_.sin_addr.s_addr = htonl(isLoopback ? INADDR_LOOPBACK : INADDR_ANY);
 }
 
+void IpAddress::reset() {
+	memset(&addr_, 0, sizeof(struct sockaddr_in));
+}
+
 uint16_t IpAddress::port() const {
 	return ntohs(addr_.sin_port);
 }

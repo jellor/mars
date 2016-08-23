@@ -10,6 +10,7 @@
 
 #include "SocketConnector.h"
 #include "Log.h"
+#include "Timestamp.h"
 #include <errno.h>
 
 using namespace mars;
@@ -31,6 +32,14 @@ SocketConnector::~SocketConnector() {
 
 void SocketConnector::connect() {
 	event_loop_->doFunc(std::bind(&SocketConnector::run, this));
+}
+
+void SocketConnector::reconnect() {
+	handler_.reset();
+	socket_.close();
+	handler_.reset(event_loop_, socket_.fd());
+	socket_.setNoDelay(true);
+	connect();
 }
 
 void SocketConnector::run() {
@@ -70,7 +79,8 @@ void SocketConnector::run() {
 
 void SocketConnector::onWritable() {
 	IpAddress peer_address;
-	int error;
+
+	int err = errno;
 	if (Socket::getPeerAddress(socket_.fd(), &peer_address)) {
 		handler_.disableWrite();
 		IpAddress local_address;
@@ -92,9 +102,14 @@ void SocketConnector::onWritable() {
 			WARN << "Connect To Self";
 		}
 	} else {
-		DEBUG << "Fd => " << socket_.fd() << " Peer  Address " << peer_address.toString();
-		handleErrorCallback();
-		handler_.remove();
+		if (err == ETIMEDOUT || err == ECONNRESET || err == ECONNREFUSED || err == EINTR) {
+			event_loop_->addTimer(std::bind(&SocketConnector::reconnect, this), Timestamp::now().macrosecond(), 3, 1);
+		} else {
+			assert(false);
+			DEBUG << "Fd => " << socket_.fd() << " Peer  Address " << peer_address.toString();
+			handleErrorCallback();
+			handler_.remove();
+		}
 	}
 }
 

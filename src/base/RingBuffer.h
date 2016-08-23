@@ -36,13 +36,17 @@ public:
 	unsigned int unused() const { return capacity_ - size_; }
 	void resize(unsigned int size);
 	void extend(unsigned int size);
-	bool backUp(unsigned int count);
-	bool skip(unsigned int count);
 
+	bool backUpFromHead(unsigned int count);
+	bool skipFromHead(unsigned int count);
+	bool backUpFromTail(unsigned int count);
+	bool skipFromTail(unsigned int count);
+
+	void adjust();
 	void clear();
 
 private:
-	unsigned int head_index;
+	unsigned int head_index; // ? signed int head_index
 	unsigned int tail_index;
 	unsigned int size_;
 	unsigned int capacity_;

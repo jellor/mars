@@ -66,7 +66,7 @@ void EventLoop::loop() {
 
 	int64_t timeout;
 	int64_t now;
-	int64_t nextTimeout;
+	int64_t next_timeout;
 	while (started_) {
 
 		timeout = 0;
@@ -75,14 +75,14 @@ void EventLoop::loop() {
 		// {
 		// 	Lock lock(mutex_);
 		// 	if (!heap_->empty()) {
-		// 		nextTimeout = (heap_->top())->timeout();
-		// 		timeout = nextTimeout > now ? nextTimeout - now : 0; 
+		// 		next_timeout = (heap_->top())->timeout();
+		// 		timeout = next_timeout > now ? next_timeout - now : 0; 
 		// 	}
 		// }
 
 		if (!heap_.empty()) {
-				nextTimeout = (heap_.top())->timeout();
-				timeout = nextTimeout > now ? nextTimeout - now : 0; 
+			next_timeout = (heap_.top())->timeout();
+			timeout = next_timeout > now ? next_timeout - now : 0; 
 		}
 
 		selector_->dispatch(timeout);
@@ -96,11 +96,11 @@ void EventLoop::loop() {
 
 
 void EventLoop::doTimeout(int64_t now) {
-	int64_t nextTimeout;
+	int64_t next_timeout;
 	Timer* curTimer;	
 	while (!heap_.empty()) {
-		nextTimeout = (heap_.top())->timeout();
-		if (nextTimeout > now) break;
+		next_timeout = (heap_.top())->timeout();
+		if (next_timeout > now) break;
 		curTimer = heap_.pop();
 		curTimer->run();
 		if (curTimer->isValid()) {

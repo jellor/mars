@@ -45,7 +45,7 @@ sockfd_(sockfd)
 }
 
 Socket::~Socket() {
-	DEBUG << "Socket Fd -> " << sockfd_ << " Closing ...";
+	// DEBUG << "Socket Fd -> " << sockfd_ << " Closing ...";
 	if (sockfd_ != -1) {
 		::close(sockfd_);
 	}

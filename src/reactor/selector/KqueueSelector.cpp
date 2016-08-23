@@ -48,10 +48,10 @@ void KqueueSelector::dispatch(int64_t timeout_usec) {
 		struct kevent& active_event = active_event_list_[i];
 		Handler* active_handler = (Handler*) active_event.udata;
 
-		DEBUG << "errno => " << errno;
-		DEBUG << "errno => " << Log::getError();
-		DEBUG << "fd    => " << active_handler->fd();
-		DEBUG << "status=> " << active_handler->getStatus();
+		// DEBUG << "errno => " << errno;
+		// DEBUG << "errno => " << Log::getError();
+		// DEBUG << "fd    => " << active_handler->fd();
+		// DEBUG << "status=> " << active_handler->getStatus();
 
 		if (active_event.flags & EV_ERROR) {
 			DEBUG << "EV_ERROR";
@@ -77,12 +77,6 @@ void KqueueSelector::dispatch(int64_t timeout_usec) {
 }
 
 void KqueueSelector::addHandler(Handler* handler) {
-	DEBUG << "errno => " << errno;
-	DEBUG << "errno => " << Log::getError();
-	DEBUG << "fd => " << handler->fd();
-	DEBUG << "status=> " << handler->getStatus();
-	DEBUG << "readable " << handler->isReadable();
-	DEBUG << "writable " << handler->isWritable();
 	struct kevent event[2];
 	if (handler->isReadable()) {
 		EV_SET(&event[0], handler->fd(), EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, handler);	
@@ -97,12 +91,12 @@ void KqueueSelector::addHandler(Handler* handler) {
 	kevent(kqfd_, event, 2, NULL, 0, NULL);
 	handler_set_.insert(handler);
 	handler->setStatus(ADD);
-	DEBUG << "errno => " << errno;
-	DEBUG << "errno => " << Log::getError();
-	DEBUG << "fd => " << handler->fd();
-	DEBUG << "status=> " << handler->getStatus();
-	DEBUG << "readable " << handler->isReadable();
-	DEBUG << "writable " << handler->isWritable();
+	// DEBUG << "errno => " << errno;
+	// DEBUG << "errno => " << Log::getError();
+	// DEBUG << "fd => " << handler->fd();
+	// DEBUG << "status=> " << handler->getStatus();
+	// DEBUG << "readable " << handler->isReadable();
+	// DEBUG << "writable " << handler->isWritable();
 }
 
 void KqueueSelector::updateHandler(Handler* handler) {
@@ -121,12 +115,12 @@ void KqueueSelector::updateHandler(Handler* handler) {
 }
 
 void KqueueSelector::removeHandler(Handler* handler) {
-	DEBUG << "errno => " << errno;
-	DEBUG << "errno => " << Log::getError();
-	DEBUG << "fd => " << handler->fd();
-	DEBUG << "status=> " << handler->getStatus();
-	DEBUG << "readable " << handler->isReadable();
-	DEBUG << "writable " << handler->isWritable();
+	// DEBUG << "errno => " << errno;
+	// DEBUG << "errno => " << Log::getError();
+	// DEBUG << "fd => " << handler->fd();
+	// DEBUG << "status=> " << handler->getStatus();
+	// DEBUG << "readable " << handler->isReadable();
+	// DEBUG << "writable " << handler->isWritable();
 
 	struct kevent event[2];
 
@@ -134,22 +128,22 @@ void KqueueSelector::removeHandler(Handler* handler) {
 	kevent(kqfd_, &event[0], 1, NULL, 0, NULL);
 
 	
-	DEBUG << "errno => " << errno;
-	DEBUG << "errno => " << Log::getError();
-	DEBUG << "fd => " << handler->fd();
-	DEBUG << "status=> " << handler->getStatus();
-	DEBUG << "readable " << handler->isReadable();
-	DEBUG << "writable " << handler->isWritable();
+	// DEBUG << "errno => " << errno;
+	// DEBUG << "errno => " << Log::getError();
+	// DEBUG << "fd => " << handler->fd();
+	// DEBUG << "status=> " << handler->getStatus();
+	// DEBUG << "readable " << handler->isReadable();
+	// DEBUG << "writable " << handler->isWritable();
 
 	EV_SET(&event[1], handler->fd(), EVFILT_WRITE, EV_DELETE, 0, 0, handler);
 	kevent(kqfd_, &event[1], 1, NULL, 0, NULL);
 
 	handler_set_.erase(handler);
 	handler->setStatus(DEL);
-	DEBUG << "errno => " << errno;
-	DEBUG << "errno => " << Log::getError();
-	DEBUG << "fd => " << handler->fd();
-	DEBUG << "status=> " << handler->getStatus();
+	// DEBUG << "errno => " << errno;
+	// DEBUG << "errno => " << Log::getError();
+	// DEBUG << "fd => " << handler->fd();
+	// DEBUG << "status=> " << handler->getStatus();
 }
 
 #endif // __APPLE__

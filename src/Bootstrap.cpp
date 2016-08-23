@@ -11,7 +11,7 @@
 
 using namespace mars;
 
-Bootstrap::Bootstrap(const std::vector<IpAddress*>& listen_address_list, const std::vector<IpAddress*>& connect_address_list, 
+Bootstrap::Bootstrap(const std::vector<IpAddress>& listen_address_list, const std::vector<IpAddress>& connect_address_list, 
 	int acceptor_count, int worker_count, int worker_thread_count = 2):
 acceptor_(nullptr),
 connector_(nullptr),
@@ -119,8 +119,6 @@ void Bootstrap::handleRead(const ChannelPtr& channel_ptr) {
 void Bootstrap::handleClose(const ChannelPtr& channel_ptr) {
 	DEBUG << "Handle Close";
 
-	DEBUG << "errno => " << errno;
-	DEBUG << "errno => " << Log::getError();
 	if (close_callback_ != nullptr) {
 		close_callback_(channel_ptr);
 	}
@@ -129,8 +127,8 @@ void Bootstrap::handleClose(const ChannelPtr& channel_ptr) {
 	if (handler_chain != nullptr) {
 		handler_chain->fireInactive(channel_ptr);
 	}
-	DEBUG << "errno => " << errno;
-	DEBUG << "errno => " << Log::getError();
+	// DEBUG << "errno => " << errno;
+	// DEBUG << "errno => " << Log::getError();
 }
 
 void Bootstrap::handleWrite(const ChannelPtr& channel_ptr) {

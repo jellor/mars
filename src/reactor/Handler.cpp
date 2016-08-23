@@ -27,7 +27,7 @@ error_callback_(nullptr)
 }
 
 Handler::~Handler() {
-	DEBUG << "Handler Destructor ...";
+	// DEBUG << "Handler Destructor ...";
 	readable_ = false;
 	writable_ = false;
 	remove();

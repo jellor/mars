@@ -2,7 +2,7 @@
 SET(EXECUTABLE_OUTPUT_PATH ../bin)
 
 #指定头文件的搜索路径, 相当于指定gcc的-I参数
-INCLUDE_DIRECTORIES(../src ../src/base ../src/handler ../src/network ../src/reactor ../src/reactor/selector)
+INCLUDE_DIRECTORIES(../ ../src ../src/base ../src/codec ../src/handler ../src/network ../src/reactor ../src/reactor/selector)
 #动态链接库或静态链接库的搜索路径, 相当于gcc的-L参数
 LINK_DIRECTORIES(../lib)
 
@@ -36,4 +36,27 @@ TARGET_LINK_LIBRARIES(Timer mars pthread)
 #指定生成目标
 ADD_EXECUTABLE(Move Move.cpp)
 #添加链接库, 相同于指定-l参数
-TARGET_LINK_LIBRARIES(Move mars)
+TARGET_LINK_LIBRARIES(Move mars pthread)
+
+#指定生成目标
+ADD_EXECUTABLE(Base64 Base64.cpp)
+#添加链接库, 相同于指定-l参数
+TARGET_LINK_LIBRARIES(Base64 mars)
+
+#指定生成目标
+ADD_EXECUTABLE(Channel Channel.cpp)
+#添加链接库, 相同于指定-l参数
+TARGET_LINK_LIBRARIES(Channel mars)
+
+#指定生成目标
+ADD_EXECUTABLE(ProtobufServer ProtobufServer.cpp)
+#添加链接库, 相同于指定-l参数
+TARGET_LINK_LIBRARIES(ProtobufServer mars pthread protobuf)
+
+#指定生成目标
+ADD_EXECUTABLE(ProtobufClient ProtobufClient.cpp)
+#添加链接库, 相同于指定-l参数
+TARGET_LINK_LIBRARIES(ProtobufClient mars pthread protobuf)
+
+
+

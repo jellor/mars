@@ -14,11 +14,10 @@ class ClientHandler : public InboundHandlerAdapter {
 public:
 	ClientHandler() {
 		DEBUG << "ClientHandler Constructor ...";
-		setName("ClientHandler");
 	}
 
 	~ClientHandler() {
-		DEBUG << getName() << " Destructor ...";
+		DEBUG << " Destructor ...";
 	}
 
 	void onActive(const ChannelPtr& channel_ptr) override {
@@ -46,7 +45,6 @@ class EncoderHandler : public InboundHandlerAdapter {
 public:
 	EncoderHandler() {
 		DEBUG << "EncoderHandler Constructor ...";
-		setName("EncoderHandler");
 	}
 
 	virtual ~EncoderHandler() {
@@ -69,7 +67,6 @@ class DecoderHandler : public OutboundHandlerAdapter {
 public:
 	DecoderHandler() {
 		DEBUG << "DecoderHandler Constructor ...";
-		setName("DecoderHandler");
 	}
 
 	virtual ~DecoderHandler() {
@@ -84,7 +81,7 @@ public:
 
 class Client {
 public:
-	Client(const std::vector<IpAddress*>& listen_address_list, const std::vector<IpAddress*>& connect_address_list,
+	Client(const std::vector<IpAddress>& listen_address_list, const std::vector<IpAddress>& connect_address_list,
 		int acceptor_count, int worker_count, int worker_thread_count):
 		bootstrap_(listen_address_list, connect_address_list, acceptor_count, worker_count, worker_thread_count)
 	{
@@ -97,16 +94,13 @@ public:
 		DEBUG << "Client Destructor OK";
 	}
 
-	void addInHandler(AbstractInboundHandler* handler) {
+	void start() {
 		bootstrap_.setChainFactory([] (const ChannelPtr& channel_ptr) {
-			HandlerChain* chain = new HandlerChain();
+			HandlerChain* chain    = new HandlerChain();
 			ClientHandler* handler = new ClientHandler();
 			chain->addInHandler(handler);
 			return chain;
 		});
-	}
-
-	void start() {
 		bootstrap_.start();
 	}
 
@@ -115,6 +109,9 @@ private:
 };
 
 int main() {
+	std::vector<IpAddress> listen_address_list;
+	std::vector<IpAddress> connect_address_list;
+
 
 	IpAddress ip_address("127.0.0.1", 8090);
 
@@ -129,26 +126,16 @@ int main() {
 	cout << "Enter A Connection Number" << endl;;
 	int count;
 	cin >> count;
-
-	std::vector<IpAddress*> listen_address_list;
-	std::vector<IpAddress*> connect_address_list;
-
-	DEBUG << ip_address.toString();
-
 	for (int i = 0; i < count; i ++) {
-		connect_address_list.push_back(&ip_address);
+		connect_address_list.push_back(ip_address);
 	}
 
 
-	Client Client(listen_address_list, connect_address_list, 1, 5, 2);
-
-	ClientHandler* handler = new ClientHandler();
-
-	Client.addInHandler(handler);
+	Client Client(listen_address_list, connect_address_list, 1, 2, 2);
 
 	Client.start();
-
 	DEBUG << "STOP";
+
 	return 0;
 }
 

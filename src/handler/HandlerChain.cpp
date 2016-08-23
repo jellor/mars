@@ -25,31 +25,45 @@ sink_handler_(new SinkHandler())
 
 HandlerChain::~HandlerChain() {
 	DEBUG << "HandlerChain Destructor ...";
-	// while (in_handler_chain_head_ != nullptr) {
-	// 	AbstractInboundHandler* temp = in_handler_chain_head_;
-	// 	in_handler_chain_head_ = in_handler_chain_head_->getNext();
-	// 	delete temp;
+	while (in_handler_chain_head_ != nullptr) {
+		AbstractInboundHandler* temp = in_handler_chain_head_;
+		in_handler_chain_head_ = in_handler_chain_head_->getNext();
+
+		bool deletable = true;
+
+		for (AbstractOutboundHandler* it = out_handler_chain_head_; it != nullptr; it = it->getNext()) {
+			if (((AbstractHandler*)it)->getName() == ((AbstractHandler*)temp)->getName()) {
+				deletable = false;
+				break;
+			}
+		}
+		if (deletable) {
+			delete temp;
+		}
+
+	}
+
+	// delete in_handler_chain_;
+	// if (in_handler_chain_head_ != nullptr) {
+	// 	delete in_handler_chain_head_;
 	// }
 
-	if (in_handler_chain_head_ != nullptr) {
-		delete in_handler_chain_head_;
-	}
-
-	if (out_handler_chain_head_ != nullptr) {
-		delete out_handler_chain_head_;
-	} else {
-		delete sink_handler_;
-	}
-	
-	// if (out_handler_chain_head_ == nullptr) {
-	// 	delete sink_handler_;
+	// delete out_handler_chain_;
+	// if (out_handler_chain_head_ != nullptr) {
+	// 	delete out_handler_chain_head_;
 	// } else {
-	// 	while (out_handler_chain_head_ != nullptr) {
-	// 		AbstractOutboundHandler* temp = out_handler_chain_head_;
-	// 		out_handler_chain_head_ = out_handler_chain_head_->getNext();
-	// 		delete temp;
-	// 	}
+	// 	delete sink_handler_;
 	// }
+	
+	if (out_handler_chain_head_ == nullptr) {
+		delete sink_handler_;
+	} else {
+		while (out_handler_chain_head_ != nullptr) {
+			AbstractOutboundHandler* temp = out_handler_chain_head_;
+			out_handler_chain_head_ = out_handler_chain_head_->getNext();
+			delete temp;
+		}
+	}
 
 }
 

@@ -18,10 +18,10 @@ next_(nullptr)
 }
 
 AbstractOutboundHandler::~AbstractOutboundHandler() {
-	DEBUG << "AbstractOutboundHandler Destructor ...";
-	if (next_ != nullptr) {
-		delete next_;
-	}
+	// DEBUG << "AbstractOutboundHandler Destructor ...";
+	// if (next_ != nullptr) {
+	// 	delete next_;
+	// }
 }
 
 void AbstractOutboundHandler::setNext(AbstractOutboundHandler* next) {

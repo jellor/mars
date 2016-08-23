@@ -27,6 +27,7 @@ public:
 	~SocketConnector();
 
 	void connect();
+	void reconnect();
 	void setConnectCallback(const ConnectCallback& cb) { connect_callback_ = cb; }
 	void setErrorCallback(const ErrorCallback& cb) { error_callback_ = cb; }
 

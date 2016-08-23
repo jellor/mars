@@ -13,7 +13,7 @@
 
 using namespace mars;
 
-Connector::Connector(const std::vector<IpAddress*>& ip_address_list):
+Connector::Connector(const std::vector<IpAddress>& ip_address_list):
 started_(false),
 event_loop_(nullptr),
 ip_address_list_(ip_address_list),
@@ -47,7 +47,7 @@ void Connector::start() {
 	while (started_ == false) {}
 
 	for (int i = 0; i < ip_address_list_.size(); i ++) {
-		SocketConnector* element = new SocketConnector(event_loop_, *ip_address_list_[i]);
+		SocketConnector* element = new SocketConnector(event_loop_, ip_address_list_[i]);
 		element->setConnectCallback(std::bind(&Connector::handleConnectEvent, this, std::placeholders::_1));
 		element->connect();
 		//element->setConnectCallback(std::bind(&Connector::handleConnectEvent, this, std::placeholders::_1));

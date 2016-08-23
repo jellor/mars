@@ -13,10 +13,11 @@
 #include <unistd.h> 
 #include <fcntl.h>
 #include <errno.h>
+#include <assert.h>
 
 using namespace mars;
 
-Acceptor::Acceptor(const std::vector<IpAddress*>& ip_address_list, int acceptor_count, int worker_count):
+Acceptor::Acceptor(const std::vector<IpAddress>& ip_address_list, int acceptor_count, int worker_count):
 acceptor_group_(acceptor_count),
 worker_group_(worker_count),
 ip_address_list_(ip_address_list),
@@ -44,7 +45,7 @@ void Acceptor::start() {
 	acceptor_group_.start();
 	worker_group_.start();
 	for (int i = 0; i < ip_address_list_.size(); i ++) {
-		SocketAcceptor* element = new SocketAcceptor(acceptor_group_.next(), *ip_address_list_[i]);
+		SocketAcceptor* element = new SocketAcceptor(acceptor_group_.next(), ip_address_list_[i]);
 		element->setAcceptCallback(
 			std::bind(&Acceptor::handleAcceptEvent, this, 
 				std::placeholders::_1,
@@ -86,11 +87,7 @@ void Acceptor::handleAcceptEvent(int fd, const IpAddress& local_address, const I
 		event_loop = acceptor_group_.next();
 	}
 
-	if (event_loop == nullptr) {
-		DEBUG << "Event Loop Should Not Nullptr";
-		return ;
-	}
-
+	assert(event_loop != nullptr);
 	event_loop->doFunc(std::bind(&Acceptor::runInEventLoop, this, event_loop, fd, local_address, peer_address));
 	
 }

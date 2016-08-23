@@ -18,7 +18,7 @@ namespace mars {
 class SinkHandler : public AbstractOutboundHandler {
 public:
 	SinkHandler() {
-		DEBUG << "SinkHandler Constructor ..."; 
+		// DEBUG << "SinkHandler Constructor ..."; 
 	};
 
 	virtual ~SinkHandler() { 
@@ -32,6 +32,8 @@ public:
 	virtual void shutdownSend(const ChannelPtr& channel_ptr) override;
 	virtual void shutdownReceive(const ChannelPtr& channel_ptr) override;
 	virtual void close(const ChannelPtr& channel_ptr) override;
+
+	virtual const std::string getName() override { return "SinkHandler"; }
 
 };
 

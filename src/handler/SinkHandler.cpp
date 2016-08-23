@@ -29,17 +29,17 @@ void SinkHandler::connect(const IpAddress& remote_address) {
 }
 
 void SinkHandler::shutdownSend(const ChannelPtr& channel_ptr) {
-	WARN << "Shutdown " << channel_ptr->getPeerAddress().toString() << " Send";
+	// WARN << "Shutdown " << channel_ptr->getPeerAddress().toString() << " Send";
 	channel_ptr->shutdownSend();
 }
 
 void SinkHandler::shutdownReceive(const ChannelPtr& channel_ptr) {
-	WARN << "Shutdown " << channel_ptr->getPeerAddress().toString() << " Receive";
+	// WARN << "Shutdown " << channel_ptr->getPeerAddress().toString() << " Receive";
 	channel_ptr->shutdownReceive();
 }
 
 void SinkHandler::close(const ChannelPtr& channel_ptr) {
-	WARN << "Close " << channel_ptr->getPeerAddress().toString() << " Send";
+	// WARN << "Close " << channel_ptr->getPeerAddress().toString() << " Send";
 	channel_ptr->close();
 }
 

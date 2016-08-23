@@ -16,12 +16,31 @@
 
 using namespace mars;
 
+Channel::Channel():
+event_loop_(nullptr),
+socket_(-1),
+local_address_(),
+peer_address_(),
+handler_(event_loop_, socket_.fd()),
+out_buffer_(),
+in_buffer_(),
+opened_(false),
+connect_callback_(nullptr),
+read_callback_(nullptr),
+write_callback_(nullptr),
+close_callback_(nullptr),
+error_callback_(nullptr),
+handler_chain_(nullptr)
+{
+
+}
+
 Channel::Channel(EventLoop* event_loop, int sockfd, const IpAddress& local_address, const IpAddress& peer_address):
 event_loop_(event_loop),
 socket_(sockfd),
 local_address_(local_address),
 peer_address_(peer_address),
-handler_(event_loop, socket_.fd()),
+handler_(event_loop_, socket_.fd()),
 out_buffer_(),
 in_buffer_(),
 opened_(true),
@@ -39,26 +58,23 @@ handler_chain_(nullptr)
 }
 
 Channel::~Channel() {
-	DEBUG << "Channel Destructor ... ";
+	// DEBUG << "Channel Destructor ... ";
 	
 	socket_.close();
 
 	if (handler_chain_ != nullptr) {
-		DEBUG << "Ok";
 		delete handler_chain_;
-	} else {
-		DEBUG << "Fail";
 	}
-	handler_chain_    = nullptr;
+	handler_chain_ = nullptr;
 }
 
 void Channel::reset() {
 
 	event_loop_ = nullptr;
+	local_address_.reset();
+	peer_address_.reset();
 	handler_.reset();
 	socket_.close();
-	DEBUG << "errno => " << errno;
-	DEBUG << "errno => " << Log::getError();
 	out_buffer_.clear();
 	in_buffer_.clear();
 	opened_ 		  = false;
@@ -69,23 +85,19 @@ void Channel::reset() {
 	error_callback_   = nullptr;
 
 	if (handler_chain_ != nullptr) {
-		DEBUG << "Ok";
 		delete handler_chain_;
-	} else {
-		DEBUG << "Fail";
 	}
-	handler_chain_    = nullptr;
+	handler_chain_ = nullptr;
 }
 
 void Channel::reset(EventLoop* event_loop, int sockfd, const IpAddress& local_address, const IpAddress& peer_address) {
-	DEBUG << "Reset and Reuse Channel";
+	// DEBUG << "Reset and Reuse Channel";
 	event_loop_ = event_loop;
 	socket_.reset(sockfd);
 	handler_.reset(event_loop_, socket_.fd());
 	setLocalAddress(local_address);
 	setPeerAddress(peer_address);
 	opened_ = true;
-
 	socket_.setNoDelay(true);
 	handler_.setReadCallback(std::bind(&Channel::handleReadEvent, this));
 	handler_.setWriteCallback(std::bind(&Channel::handleWriteEvent, this));
@@ -139,8 +151,6 @@ void Channel::send(const RingBuffer* buffer) {
 		WARN << "Channel Is Not Opened";
 		return ;
 	}
-	DEBUG << "Size " << buffer->size() << " Capacity " << buffer->capacity();
-	DEBUG << "Head " << buffer->head() << " Base " << buffer->base();
  	send(buffer->head(), buffer->size());
 }
 
@@ -239,20 +249,16 @@ void Channel::handleReadEvent() {
 	int size = in_buffer_.read(socket_.fd());
 	
 	if (size <= 0) {
-		// ? what happen
-		int error;
+		DEBUG << "From Fd => " << socket_.fd() << " Receive Size => " << size;
 		DEBUG << "errno => " << errno;
 		DEBUG << "errno => " << Log::getError();
-
-		int ret = Socket::getError(socket_.fd(), &error);
-
-		DEBUG << "Receive Size => " << size;
 		if (close_callback_ != nullptr) {
 			close_callback_(shared_from_this());
 		}
 
-		DEBUG << "errno => " << errno;
-		DEBUG << "errno => " << Log::getError();
+		if (opened_ == true) {
+			close();
+        }
 
 	} else {
         DEBUG << "in_buffer Size " << in_buffer_.size() << " Capacity " << in_buffer_.capacity();

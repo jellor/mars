@@ -15,6 +15,8 @@
 
 namespace mars {
 
+class Channel;
+
 class AbstractOutboundHandler : public AbstractHandler {
 public:
 	AbstractOutboundHandler();

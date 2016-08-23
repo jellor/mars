@@ -25,7 +25,7 @@ class Bootstrap : public NonCopyable {
 	typedef std::function<HandlerChain* (const ChannelPtr&)> ChainFactory;
 
 public:
-	Bootstrap(const std::vector<IpAddress*>& listen_address_list, const std::vector<IpAddress*>& connect_address_list, 
+	Bootstrap(const std::vector<IpAddress>& listen_address_list, const std::vector<IpAddress>& connect_address_list, 
 	int acceptor_count, int worker_count, int worker_thread_count);
 	~Bootstrap();
 

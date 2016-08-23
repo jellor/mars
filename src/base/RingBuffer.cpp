@@ -15,6 +15,7 @@
 #include <sys/uio.h>
 #include <unistd.h>
 #include <errno.h>
+#include <assert.h>
 
 using namespace mars;
 
@@ -43,9 +44,9 @@ size_(0)
 }
 
 RingBuffer::~RingBuffer() {
-	DEBUG << "RingBuffer Destructor ...";
+	// DEBUG << "RingBuffer Destructor ...";
 	if (buffer_ != NULL) {
-		DEBUG << "Free buffer_";
+		// DEBUG << "Free buffer_";
 		free(buffer_);
 	}
 }
@@ -162,17 +163,41 @@ void RingBuffer::extend(unsigned int size) {
 	}
 }
 
-bool RingBuffer::backUp(unsigned int count) {
+bool RingBuffer::backUpFromHead(unsigned int count) {
+	if (size_ + count > capacity_) return false;
+	head_index = (head_index + capacity_ - count) % capacity_;
+	size_	   = size_ + count;
+}
+
+bool RingBuffer::skipFromHead(unsigned int count) {
+	if (size_ < count) return false;
+	head_index = (head_index + count) % capacity_;
+	size_      = size_ - count;
+}
+
+bool RingBuffer::backUpFromTail(unsigned int count) {
 	if (size_ < count) return false;
 	tail_index = (tail_index + capacity_ - count) % capacity_;
 	size_      = size_ - count;
 	return true;
 }
 
-bool RingBuffer::skip(unsigned int count) {
+bool RingBuffer::skipFromTail(unsigned int count) {
 	if (size_ + count > capacity_) return false;
 	tail_index = (tail_index + count) % capacity_;
 	size_      = size_ + count;
+}
+
+void RingBuffer::adjust() {
+	if (head_index >= tail_index && size_ != 0) {
+		char* tmp = static_cast<char*>(malloc(tail_index));
+		memcpy(tmp, buffer_, tail_index);
+		memcpy(buffer_, buffer_ + head_index, capacity_ - head_index);
+		memcpy(buffer_ + (capacity_ - head_index), tmp, tail_index);
+		head_index = 0;
+		tail_index = size_;
+	}
+	assert(head_index <= tail_index);
 }
 
 void RingBuffer::clear() {

@@ -17,6 +17,7 @@
 #include "Socket.h"
 #include <memory>
 #include <string>
+#include <assert.h>
 
 namespace mars {
 
@@ -27,6 +28,7 @@ class Channel : public std::enable_shared_from_this<Channel> {
 	typedef std::function<void(const std::shared_ptr<Channel>&)> EventCallback;
 
 public:
+	Channel();
 	Channel(EventLoop* event_loop, int sockfd, const IpAddress& local_address, const IpAddress& peer_address);
 	~Channel();
 
@@ -39,6 +41,32 @@ public:
 	bool isOpen() const { return opened_; }
 	void reset();
 	void reset(EventLoop* event_loop, int sockfd, const IpAddress& local_address, const IpAddress& peer_address);
+
+	void enableRead() {
+		assert(opened_ == true);
+		handler_.enableRead();
+	}
+
+	void enableWrite() {
+		assert(opened_ == true);
+		handler_.enableWrite();
+	}
+
+	void disableRead() {
+		assert(opened_ == true);
+		handler_.disableRead();
+	}
+
+	void disableWrite() {
+		assert(opened_ == true);
+		handler_.disableWrite();
+	}
+
+	void disableBoth() {
+		assert(opened_ == true);
+		handler_.disableRead();
+		handler_.disableWrite();
+	}
 
 	void shutdownReceive();
 	void shutdownSend();
@@ -57,8 +85,10 @@ public:
 	const IpAddress& getLocalAddress()  const { return local_address_; }
 	const IpAddress& getPeerAddress()   const { return peer_address_;  }
 
-	//const RingBuffer* getOutBuffer() const { return &out_buffer_; }
-	//const RingBuffer* getInBuffer()  const { return &in_buffer_;  }
+	RingBuffer* getMutableOutBuffer() const { return const_cast<RingBuffer*>(&out_buffer_); }
+	RingBuffer* getMutableInBuffer()  const { return const_cast<RingBuffer*>(&in_buffer_);  }
+	const RingBuffer* getOutBuffer() const { return &out_buffer_; }
+	const RingBuffer* getInBuffer()  const { return &in_buffer_;  }
 
 	void setEventLoop(EventLoop* event_loop) {
 		event_loop_ = event_loop;

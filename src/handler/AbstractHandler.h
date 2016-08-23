@@ -18,14 +18,11 @@ namespace mars {
 
 class AbstractHandler : public NonCopyable {
 public:
-	AbstractHandler(): name_() {};
+	AbstractHandler() {};
 	virtual ~AbstractHandler() { DEBUG << "AbstractHandler Destructor ..."; };
 
-	virtual const std::string& getName() const { return name_; }
-	virtual void setName(const std::string& name)    { name_ = name; }
+	virtual const std::string getName() { return "AbstractHandler"; }
 
-private:
-	std::string name_;
 };
 
 }

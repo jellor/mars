@@ -1,0 +1,6 @@
+package Im;
+
+message Query {
+	required int32 type_name = 1;
+	required int32 len = 2;
+}

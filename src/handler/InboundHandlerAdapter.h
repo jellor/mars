@@ -58,6 +58,10 @@ public:
 		}
 
 	}
+
+	virtual const std::string getName() override {
+		return "InboundHandlerAdapter";
+	}
 };
 
 }

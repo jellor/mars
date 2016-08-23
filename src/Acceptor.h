@@ -27,7 +27,7 @@ typedef std::function<void(const ChannelPtr&)> EventCallback;
 
 class Acceptor : public NonCopyable {
 public:
-	Acceptor(const std::vector<IpAddress*>& ip_address_list, int acceptor_count, int worker_count);
+	Acceptor(const std::vector<IpAddress>& ip_address_list, int acceptor_count, int worker_count);
 	~Acceptor();
 
 	void start();
@@ -69,7 +69,7 @@ private:
 
 	EventLoopGroup acceptor_group_;
 	EventLoopGroup worker_group_;
-	std::vector<IpAddress*> ip_address_list_;
+	std::vector<IpAddress> ip_address_list_;
 	std::vector<SocketAcceptor*> socket_acceptor_list_;
 
 	FilterCallback filter_callback_;

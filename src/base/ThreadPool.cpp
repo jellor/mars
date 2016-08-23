@@ -48,7 +48,8 @@ void ThreadPool::stop() {
 		Lock lock(mutex_);
 		started_ = false;	
 	}
-	//condition_.broadcast();
+	condition_.broadcast();
+	
 	for(int i = 0; i < thread_count_; i ++) {
 		//threads_[i]->cancel();
 		if (threads_[i]->join()) {
@@ -80,7 +81,7 @@ void ThreadPool::runInThread() {
 				condition_.wait();
 			}
 			DEBUG << "Before Break";
-			if (!started_) break;
+			if (!started_ && tasks_.empty()) break;
 			DEBUG << "After  Break";
 			task = tasks_.front();
 			tasks_.pop();

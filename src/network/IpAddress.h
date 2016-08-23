@@ -25,8 +25,11 @@ public:
 	IpAddress(): IpAddress(0) {}
 	IpAddress(const struct sockaddr_in& addr): addr_(addr) {};
 
-	~IpAddress() { DEBUG << "IpAddress Destructor ..."; }
+	~IpAddress() { 
+		// DEBUG << "IpAddress Destructor ..."; 
+	}
 
+	void reset();
 	uint16_t port() const;
 	std::string ip() const;
 	std::string toString() const;

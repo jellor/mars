@@ -22,7 +22,7 @@ namespace mars {
 class Connector : public NonCopyable {
 	typedef std::function<void(const ChannelPtr&)> EventCallback;
 public:
-	Connector(const std::vector<IpAddress*>& ip_address_list);
+	Connector(const std::vector<IpAddress>& ip_address_list);
 	~Connector();
 
 	void start();
@@ -60,7 +60,7 @@ private:
 
 	std::atomic<bool> started_;
 	EventLoop* event_loop_;
-	std::vector<IpAddress*> ip_address_list_;
+	std::vector<IpAddress> ip_address_list_;
 	std::vector<SocketConnector*> socket_connector_list_;
 
 	Thread thread_;

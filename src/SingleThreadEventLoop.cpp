@@ -50,7 +50,7 @@ EventLoop* SingleThreadEventLoop::getEventLoop() const {
 void SingleThreadEventLoop::runInThread() {
 
 	event_loop_      			= new EventLoop();
-	ChannelPool* channel_pool	= new ChannelPool(event_loop_);
+	ChannelPool* channel_pool	= new ChannelPool(event_loop_, 10000);
 	event_loop_->setContext(channel_pool);
 
 	started_ = true;

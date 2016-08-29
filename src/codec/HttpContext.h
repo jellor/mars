@@ -13,7 +13,9 @@
 #include "HttpRequest.h"
 #include "HttpResponse.h"
 #include "RingBuffer.h"
+#include "Channel.h"
 #include <string>
+#include <functional>
 
 namespace mars {
 
@@ -35,23 +37,33 @@ typedef enum {
 } PARSE_STATUS;
 
 class HttpContext {
+
+    typedef std::function<void(const ChannelPtr&)> HttpCallback;
+
 public:
 	HttpContext();
 	~HttpContext();
 
-	void encode(RingBuffer* buffer);
-	void decode(RingBuffer* buffer);
+	void setHttpCallback(const HttpCallback& cb) { http_cb_ = cb; }
+
+	RingBuffer* encode(const HttpResponse& response);
+	bool decode(const ChannelPtr& channel_ptr);
+
+	const HttpRequest& getRequest() const { return request_; }
+
 
 	PARSE_LINE_STATUS parseLine(char* byte_buffer, int& start_index, const int end_index);
 	bool parseRequestLine(char* line);
 	bool parseRequestHeader(char* line);
 	bool parseRequestBody(const char* byte_buffer, int& start, const int end);
-	int parseRequest(char* byte_buffer, const int n);
+	int  parseRequest(const ChannelPtr& channel_ptr, char* byte_buffer, const int n);
 
 private:
-	HttpRequest request_;
+	HttpRequest  request_;
 	HttpResponse response_;
 	PARSE_STATUS parse_status_;
+
+	HttpCallback http_cb_;
 };
 
 }

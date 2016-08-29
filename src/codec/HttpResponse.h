@@ -21,18 +21,26 @@ public:
 	HttpResponse(const std::string& version);
 	~HttpResponse();
 
+    void setVersion(const std::string& version);
+	const std::string& getVersion() const;
 	void setStatusCode(int status_code);
 	int getStatusCode() const;
 	void setStatusMessage(const std::string& status_message);
 	const std::string& getStatusMessage() const;
 	void setHeader(const std::string& name, const std::string& value);
 	const std::string& getHeader(const std::string& name) const;
+	void setBody(const std::string& body);
+	void setBody(const char* data, int length);
+	const std::string& getBody() const;
+
+	const std::string toString() const;
 
 private:
 	typedef std::map<const std::string, std::string> Header;
 	std::string version_;
 	int status_code_;
 	std::string status_message_;
+	std::string body_;
 
 	Header headers_;
 };

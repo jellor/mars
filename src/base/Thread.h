@@ -44,8 +44,8 @@ public:
 	static std::string getCurrentThreadName();
 
 private:
-	bool started_;
-	bool joined_;
+	std::atomic<bool> started_;
+	std::atomic<bool> joined_;
 	std::string name_;
 	std::shared_ptr<pid_t> tid_;
 	pthread_t thread_id_;

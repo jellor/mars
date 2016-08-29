@@ -61,10 +61,8 @@ int RingBuffer::read(int sockfd) { // ? can loop read()
 		iv[1].iov_base = buffer_;
 		iv[1].iov_len  = head_index;
 		size = ::readv(sockfd, iv, 2);
-        DEBUG << "readv" << size;
 	} else {
 		size = ::read(sockfd, buffer_ + tail_index, head_index - tail_index);
-		DEBUG << "read " << size;
 	}
 	tail_index = (tail_index + size) % capacity_;
 	size_      = size_ + size;
@@ -114,6 +112,8 @@ int RingBuffer::write(const char* data, unsigned int size) {
 	if (unused() < size) {
 		resize(capacity_ + size);
 	}
+	assert(unused() >= size);
+
 	unsigned int len = capacity_ - tail_index;
 	if (size > len) {
 		memcpy(buffer_ + tail_index, data, len);
@@ -124,6 +124,10 @@ int RingBuffer::write(const char* data, unsigned int size) {
 	tail_index = (tail_index + size) % capacity_;
 	size_      = size_ + size;
 	return size;
+}
+
+int RingBuffer::write(const std::string& str) {
+    return write(str.c_str(), str.size());
 }
 
 void RingBuffer::resize(unsigned int size) {

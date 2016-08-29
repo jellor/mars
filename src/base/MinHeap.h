@@ -17,7 +17,7 @@
 namespace mars {
 
 // old : #define GREATER(x, y)((x) > (y)) // ? type safe , I spend about 1 hours to solve the bug.
-// solve the bug : #define GREATER(x, y) ((*x) > (*y)) // ((x)->greater(y)) or ((x)->timeout > (y)->timeout) 
+// solve the bug : #define GREATER(x, y) ((*x) > (*y)) // ((x)->greater(y)) or ((x)->timeout > (y)->timeout)
 // the better way to solve the bug, the idea is from << effective c++ >> item 2 (Prefer consts, enums, and inlines to #defines).
 template <class T>
 inline bool GREATER(const T& x, const T& y) {
@@ -27,10 +27,10 @@ inline bool GREATER(const T& x, const T& y) {
 template<class T>
 class MinHeapInterface {
 public:
-	virtual ~MinHeapInterface() = 0; // ? comment or not
-	virtual bool operator >(const T& rhs) = 0;
-	virtual int getIndex() const = 0;
-	virtual void setIndex(int index) = 0;
+	virtual ~MinHeapInterface()             = 0; // ? comment or not
+	virtual bool operator > (const T& rhs)  = 0;
+	virtual int getIndex() const            = 0;
+	virtual void setIndex(int index)        = 0;
 };
 
 template<class T>
@@ -52,7 +52,7 @@ public:
 	bool erase(T* element);
 	void resize(unsigned int size);
 
-	void print() const { 
+	void print() const {
 		for (int i = 0 ; i < size_; i ++ ) {
 			std::cout << " Index " << i << " " << base_[i]->getIndex() << " " << base_[i]->timeout() << std::endl;
 		}
@@ -109,13 +109,13 @@ template<class T>
 void MinHeap<T>::push(T* element) {
 	int index = element->getIndex();
 	if (0 <= index && index < size_) {
-		// element is already pushed in MinHeap. 
+		// element is already pushed in MinHeap.
 		return ;
 	}
 	if (__builtin_expect(size_ >= capacity_, 0)) {
 		unsigned int size = capacity_ << 1;
 		resize(size);
-	} 
+	}
 	shiftUp(size_, element);
 	size_ ++;
 }

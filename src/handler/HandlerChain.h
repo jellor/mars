@@ -37,7 +37,7 @@ public:
 
 	void doRead(void* object);
 	void send(const ChannelPtr& channel_ptr, void* object);
-	void send(const ChannelPtr& channel_ptr, char* data, int len);
+	void send(const ChannelPtr& channel_ptr, const char* data, int len);
 	void sendTo(const ChannelPtr& channel_ptr, void* object);
 	void doBind(void* object);
 	void connect(const IpAddress& remote_address);

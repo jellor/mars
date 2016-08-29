@@ -27,8 +27,8 @@ private:
 	void loadFile(const char* file_name);
 	bool saveFile(const char* file_name);
 	void parseLine(char* line);
-	char* trim(char* line) const; 
-	
+	char* trim(char* line) const;
+
 	std::string file_name_;
 	bool loaded_;
 	std::map<std::string, std::string> configure_map_;

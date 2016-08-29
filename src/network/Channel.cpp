@@ -224,13 +224,12 @@ void Channel::sendBufferInEventLoop(const RingBuffer* buffer)
             handler_.enableWrite();
         }
 
-    }
-    else
-    {
+    } else {
         DEBUG << "out_buffer size " << out_buffer_.size() << " Capacity " << out_buffer_.capacity();
         out_buffer_.write(buffer->head(), buffer->size());
         handler_.enableWrite();
     }
+
     delete buffer;
 }
 
@@ -261,14 +260,13 @@ void Channel::sendInEventLoop(const char* data, unsigned int size)
             handler_.enableWrite();
         }
 
-    }
-    else
-    {
+    } else {
         DEBUG << "out_buffer size " << out_buffer_.size() << " Capacity " << out_buffer_.capacity();
         out_buffer_.write(data, size);
         handler_.enableWrite();
     }
 
+    delete data;
     // int written_size = 0;
 
     // if (out_buffer_.empty()) {

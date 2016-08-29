@@ -54,7 +54,7 @@ HandlerChain::~HandlerChain() {
 	// } else {
 	// 	delete sink_handler_;
 	// }
-	
+
 	if (out_handler_chain_head_ == nullptr) {
 		delete sink_handler_;
 	} else {
@@ -83,7 +83,7 @@ void HandlerChain::addInHandler(AbstractInboundHandler* handler) {
 	}
 
 	if (in_handler_chain_head_ == nullptr) {
-		in_handler_chain_head_ = handler;	
+		in_handler_chain_head_ = handler;
 	} else {
 		in_handler_chain_tail_->setNext(handler);
 	}
@@ -111,7 +111,7 @@ void HandlerChain::addOutHandler(AbstractOutboundHandler* handler) {
 	} else {
 		out_handler_chain_tail_->setNext(handler);
 	}
-	
+
 	out_handler_chain_tail_ = handler;
 	out_handler_chain_tail_->setNext(sink_handler_);
 
@@ -185,7 +185,8 @@ void HandlerChain::send(const ChannelPtr& channel_ptr, void* object) {
 
 }
 
-void HandlerChain::send(const ChannelPtr& channel_ptr, char* data, int len) {
+
+void HandlerChain::send(const ChannelPtr& channel_ptr, const char* data, int len) {
 	DEBUG << "Send";
 
 	if (out_handler_chain_head_ != nullptr) {

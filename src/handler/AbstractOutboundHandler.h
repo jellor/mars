@@ -22,13 +22,13 @@ public:
 	AbstractOutboundHandler();
 	virtual ~AbstractOutboundHandler();
 
-	virtual void send(const ChannelPtr& channel_ptr, void* object) 			= 0;
-	virtual void send(const ChannelPtr& channel_ptr, char* data, int len) 	= 0;
-	virtual void sendTo(const ChannelPtr& channel_ptr, void* object) 		= 0;
-	virtual void connect(const IpAddress& remote_address) 					= 0;
-	virtual void shutdownReceive(const ChannelPtr& channel_ptr)				= 0;
-	virtual void shutdownSend(const ChannelPtr& channel_ptr)				= 0;	
-	virtual void close(const ChannelPtr& channel_ptr)       				= 0;
+	virtual void send(const ChannelPtr& channel_ptr, void* object) 			        = 0;
+	virtual void send(const ChannelPtr& channel_ptr, const char* data, int len) 	= 0;
+	virtual void sendTo(const ChannelPtr& channel_ptr, void* object) 		        = 0;
+	virtual void connect(const IpAddress& remote_address) 					        = 0;
+	virtual void shutdownReceive(const ChannelPtr& channel_ptr)				        = 0;
+	virtual void shutdownSend(const ChannelPtr& channel_ptr)				        = 0;
+	virtual void close(const ChannelPtr& channel_ptr)       				        = 0;
 
 	void setNext(AbstractOutboundHandler* next);
 	AbstractOutboundHandler* getNext() const;

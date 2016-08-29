@@ -12,6 +12,7 @@
 
 #include "HttpContext.h"
 #include "RingBuffer.h"
+#include "HandlerChain.h"
 #include "InboundHandlerAdapter.h"
 #include "OutboundHandlerAdapter.h"
 
@@ -30,12 +31,14 @@ public:
 
 	}
 
-	virtual void onReceive(const ChannelPtr& channel_ptr, void* object) override {
-		DEBUG << "HttpContext";
-		http_context_.decode(channel_ptr->getMutableInBuffer());
-	}
+	virtual void onReceive(const ChannelPtr& channel_ptr, void* object) override;
+
+	virtual void onHttp(const ChannelPtr& channel_ptr);
+
+	void sendResponse(const ChannelPtr& channel_ptr, const HttpResponse& response);
 
 private:
+
 	HttpContext http_context_;
 };
 

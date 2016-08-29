@@ -12,6 +12,7 @@
 
 #include "NonCopyable.h"
 #include <string.h>
+#include <string>
 
 namespace mars {
 
@@ -25,12 +26,13 @@ public:
 	int write(int sockfd);
 	int read(char* data, unsigned int size);
 	int write(const char* data, unsigned int size);
+	int write(const std::string& str);
 	bool empty() const { return size_ == 0; }
 	const char* base() const { return buffer_; }
 	const char* head() const { return buffer_ + head_index; }
 	const char* tail() const { return buffer_ + tail_index; }
 	unsigned int headIndex() const { return head_index; }
-	unsigned int tailIndex() const { return tail_index; } 
+	unsigned int tailIndex() const { return tail_index; }
 	unsigned int size() const { return size_; }
 	unsigned int capacity() const { return capacity_; }
 	unsigned int unused() const { return capacity_ - size_; }

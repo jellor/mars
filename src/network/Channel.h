@@ -75,7 +75,7 @@ public:
 	void metadata();
 	std::string toString() const;
 
-	void send(const RingBuffer* buffer); // TODO
+	void send(const RingBuffer* buffer);
 	void send(const char* data, unsigned int size);
 
 	EventLoop* getEventLoop() const { return event_loop_; }
@@ -107,8 +107,6 @@ public:
 		peer_address_ = peer_address;
 	}
 
-
-
 	void setHandlerChain(HandlerChain* handler_chain) {
 		handler_chain_ = handler_chain;
 	}
@@ -129,6 +127,7 @@ private:
 	void handleWriteEvent();
 
 	EventLoop* event_loop_;
+
 	Socket socket_;
 	IpAddress local_address_;
 	IpAddress peer_address_;

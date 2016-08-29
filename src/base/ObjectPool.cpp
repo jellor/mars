@@ -16,7 +16,6 @@ template<class T>
 ObjectPool<T>::ObjectPool():
 deque_()
 {
-
 }
 
 template<class T>

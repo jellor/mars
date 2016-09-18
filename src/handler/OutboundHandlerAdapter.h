@@ -25,10 +25,10 @@ public:
 		if (next != nullptr) {
 			next->send(channel_ptr, object);
 		}
-		
+
 	};
 
-	virtual void send(const ChannelPtr& channel_ptr, char* data, int len) override {
+	virtual void send(const ChannelPtr& channel_ptr, const char* data, int len) override {
 
 		AbstractOutboundHandler* next = getNext();
 

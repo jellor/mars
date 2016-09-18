@@ -11,7 +11,7 @@
 #define __TASK_H__
 
 #include "Log.h"
- 
+
 namespace mars {
 
 typedef std::function<void(void)> TaskCallback;
@@ -30,7 +30,6 @@ public:
 
 private:
 	TaskCallback task_callback_;
-
 };
 
 }

@@ -26,8 +26,6 @@ private:
 	Mutex& mutex_;
 };
 
-// #define Lock(x) error "Operation Not Supported";
-
 }
 
 #endif

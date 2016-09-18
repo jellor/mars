@@ -18,15 +18,15 @@ namespace mars {
 class SinkHandler : public AbstractOutboundHandler {
 public:
 	SinkHandler() {
-		// DEBUG << "SinkHandler Constructor ..."; 
+		// DEBUG << "SinkHandler Constructor ...";
 	};
 
-	virtual ~SinkHandler() { 
-		DEBUG << "SinkHandler Destructor ..."; 
+	virtual ~SinkHandler() {
+		DEBUG << "SinkHandler Destructor ...";
 	};
 
 	virtual void send(const ChannelPtr& channel_ptr, void* object) override;
-	virtual void send(const ChannelPtr& channel_ptr, char* data, int len) override;
+	virtual void send(const ChannelPtr& channel_ptr, const char* data, int len) override;
 	virtual void sendTo(const ChannelPtr& channel_ptr, void* object) override;
 	virtual void connect(const IpAddress& remote_address) override;
 	virtual void shutdownSend(const ChannelPtr& channel_ptr) override;

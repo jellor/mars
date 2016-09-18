@@ -38,6 +38,8 @@ public:
 	void setBody(const std::string& body);
 	const std::string& getBody() const;
 
+	const std::string toString() const;
+
 private:
 	typedef std::map<const std::string, std::string> Header;
 	std::string method_;

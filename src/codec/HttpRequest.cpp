@@ -8,6 +8,7 @@
  *=======================================================*/
 
 #include "HttpRequest.h"
+#include <sstream>
 
 using namespace mars;
 
@@ -100,6 +101,19 @@ void HttpRequest::setBody(const std::string& body) {
 
 const std::string& HttpRequest::getBody() const {
 	return body_;
+}
+
+const std::string HttpRequest::toString() const {
+    std::stringstream ss("");
+    ss << std::endl;
+    ss << getMethod() << " " << getUri() << " " << getVersion() << std::endl;
+    for (Header::const_iterator it = headers_.begin(); it != headers_.end(); it ++) {
+        ss << (*it).first << ": " << (*it).second << std::endl;
+    }
+    if (! body_.empty()) {
+        ss << "Request Body => " << body_ << std::endl;
+    }
+    return ss.str();
 }
 
 

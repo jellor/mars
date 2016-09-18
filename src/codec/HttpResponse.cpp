@@ -8,6 +8,8 @@
  *=======================================================*/
 
 #include "HttpResponse.h"
+#include <sstream>
+#include <stdlib.h>
 
 using namespace mars;
 
@@ -30,7 +32,15 @@ headers_()
 }
 
 HttpResponse::~HttpResponse() {
-	
+
+}
+
+void HttpResponse::setVersion(const std::string& version) {
+	version_ = version;
+}
+
+const std::string& HttpResponse::getVersion() const {
+	return version_;
 }
 
 void HttpResponse::setStatusCode(int status_code) {
@@ -61,3 +71,38 @@ const std::string& HttpResponse::getHeader(const std::string& name) const {
 		return "";
 	}
 }
+
+void HttpResponse::setBody(const std::string& body) {
+    std::stringstream ss("");
+    ss << body.size();
+    setHeader("Content-Length", ss.str());
+	body_ = body;
+}
+
+void HttpResponse::setBody(const char* data, int length) {
+    std::stringstream ss("");
+    ss << length;
+    setHeader("Content-Length", ss.str());
+    body_ = data;
+}
+
+const std::string& HttpResponse::getBody() const {
+	return body_;
+}
+
+const std::string HttpResponse::toString() const {
+    std::stringstream ss("");
+
+    ss << getVersion() << " " << getStatusCode() << " " << getStatusMessage() << "\r\n";
+    for (Header::const_iterator it = headers_.begin(); it != headers_.end(); it ++) {
+        ss << (*it).first << ": " << (*it).second << "\r\n";
+    }
+    ss << "\r\n";
+    if (! body_.empty()) {
+        ss << getBody();
+    }
+    return ss.str();
+}
+
+
+

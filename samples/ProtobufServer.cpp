@@ -7,6 +7,7 @@
 #include "protobuf/Im.Query.pb.h"
 #include <google/protobuf/message.h>
 #include "Log.h"
+#include "HttpHandler.h"
 
 using namespace mars;
 using namespace Im;
@@ -61,11 +62,17 @@ public:
 	void start() {
 
 		bootstrap_.setChainFactory([] (const ChannelPtr& channel_ptr) {
-			HandlerChain* chain = new HandlerChain();
-			DefaultHandler* default_handler = new DefaultHandler();
-			chain->addInHandler(default_handler);
-			chain->addOutHandler(default_handler);
-			return chain;
+            if ((channel_ptr->getLocalAddress().port() == 8080)) {
+                HandlerChain* chain = new HandlerChain();
+                chain->addInHandler(new HttpHandler());
+                return chain;
+            } else {
+                HandlerChain* chain = new HandlerChain();
+                DefaultHandler* default_handler = new DefaultHandler();
+                chain->addInHandler(default_handler);
+                chain->addOutHandler(default_handler);
+                return chain;
+            }
 		});
 
 		bootstrap_.start();

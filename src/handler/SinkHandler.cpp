@@ -16,7 +16,7 @@ void SinkHandler::send(const ChannelPtr& channel_ptr, void* object) {
 	//channel_ptr->send(data, len);
 }
 
-void SinkHandler::send(const ChannelPtr& channel_ptr, char* data, int len) {
+void SinkHandler::send(const ChannelPtr& channel_ptr, const char* data, int len) {
 	channel_ptr->send(data, len);
 }
 
@@ -45,6 +45,6 @@ void SinkHandler::close(const ChannelPtr& channel_ptr) {
 
 
 
-  
+
 
 

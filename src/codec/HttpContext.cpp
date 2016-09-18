@@ -10,6 +10,7 @@
 #include "HttpContext.h"
 #include "Log.h"
 #include <stdlib.h>
+#include <assert.h>
 
 using namespace mars;
 
@@ -25,22 +26,28 @@ HttpContext::~HttpContext() {
 
 }
 
-void HttpContext::encode(RingBuffer* buffer) {
-
+RingBuffer* HttpContext::encode(const HttpResponse& response) {
+    RingBuffer* buffer = new RingBuffer();
+    const std::string str = response.toString();
+    buffer->write(str.c_str(), str.size());
+    return buffer;
 }
 
-void HttpContext::decode(RingBuffer* buffer) {
+bool HttpContext::decode(const ChannelPtr& channel_ptr) {
+    RingBuffer* buffer = channel_ptr->getMutableInBuffer();
 	buffer->adjust();
-	DEBUG << "head " << buffer->headIndex();
-	DEBUG << "tail " << buffer->tailIndex();
-	int length = parseRequest(const_cast<char*>(buffer->head()), buffer->size());
-	DEBUG << "length " << length;
-	if (length < 0) {
+	assert(buffer->headIndex() <= buffer->tailIndex());
+    assert(buffer->size() > 0);
 
-	} else {
-		buffer->skipFromHead(length);
-	}
-	
+	int length = parseRequest(channel_ptr, const_cast<char*>(buffer->head()), buffer->size());
+    if (length < 0) {
+        WARN << "Parse Request Fail";
+        return false;
+    } else {
+        buffer->skipFromHead(length);
+        return true;
+    }
+
 }
 
 PARSE_LINE_STATUS HttpContext::parseLine(char* buffer, int& start_index, const int end_index) {
@@ -48,8 +55,7 @@ PARSE_LINE_STATUS HttpContext::parseLine(char* buffer, int& start_index, const i
 	char crlf;
 
 	while (start_index < end_index) {
-		DEBUG << "start " << start_index;
-		DEBUG << "end   " << end_index;
+
 		crlf = buffer[start_index];
 
 		if (crlf == '\r') {
@@ -100,22 +106,20 @@ bool HttpContext::parseRequestLine(char* line) {
 	} else if (strcasecmp(line, "HEAD") == 0) {
 		request_.setMethod("HEAD");
 	} else if (strcasecmp(line, "PUT") == 0) {
-
+        request_.setMethod("PUT");
 	} else if (strcasecmp(line, "TRACE") == 0) {
-
+        request_.setMethod("TRACE");
 	} else if (strcasecmp(line, "PATCH") == 0) {
-
+        request_.setMethod("PATCH");
 	} else if (strcasecmp(line, "DELETE") == 0) {
-
+        request_.setMethod("DELETE");
 	} else if (strcasecmp(line, "OPTIONS") == 0) {
-
+        request_.setMethod("OPTIONS");
 	} else if (strcasecmp(line, "CONNECT") == 0) {
-
+        request_.setMethod("CONNECT");
 	} else {
 		return false;
 	}
-
-	DEBUG << "Methon => " << request_.getMethod();
 
 	url += strspn(url, " \t");
 
@@ -127,8 +131,6 @@ bool HttpContext::parseRequestLine(char* line) {
 	(*version ++) = '\0';
 	version += strspn(version, " \t");
 
-	DEBUG << "version --> " << version;
-
 	if (strcasecmp(version, "HTTP/1.1") == 0) {
 		request_.setVersion("HTTP/1.1");
 	} else if (strcasecmp(version, "HTTP/1.0") == 0) {
@@ -137,24 +139,19 @@ bool HttpContext::parseRequestLine(char* line) {
 		return false;
 	}
 
-	DEBUG << "Version => " << request_.getVersion();
-	DEBUG << "url => " << url;
-
 	if (strncasecmp(url, "http://", 7) == 0) {
 		url += 7;
 		url = strchr(url, '/');
 	} else if (strncasecmp(url, "https://", 8) == 0) {
 		url += 8;
 		url = strchr(url, '/');
-	} 
+	}
 
 	if (*url != '/' || url == nullptr) {
 		return false;
 	}
 
 	request_.setUri(url);
-
-	DEBUG << "uri => " << request_.getUri();
 
 	return true;
 
@@ -190,15 +187,16 @@ bool HttpContext::parseRequestBody(const char* byte_buffer, int& start, const in
 	}
 }
 
-int HttpContext::parseRequest(char* byte_buffer, const int n) {
-	int start_index = 0;
-	int line_end_index = 0;
+int HttpContext::parseRequest(const ChannelPtr& channel_ptr, char* byte_buffer, const int n) {
+	int start_index     = 0;
+	int line_end_index  = 0;
 	PARSE_LINE_STATUS parse_line_status;
+
 	while (parse_status_ == PARSE_REQUEST_BODY || (parse_line_status = parseLine(byte_buffer, line_end_index, n)) == PARSE_LINE_OK) {
 
-		DEBUG << "status " << parse_status_;
-		DEBUG << "start_index => " << start_index;
-		DEBUG << "line_end_index => " << line_end_index;
+		// DEBUG << "status => " << parse_status_;
+        // DEBUG << "start_index  => " << start_index;
+		// DEBUG << "line_end_index => " << line_end_index;
 
 		char* line = byte_buffer + start_index;
 		start_index = line_end_index;
@@ -217,28 +215,28 @@ int HttpContext::parseRequest(char* byte_buffer, const int n) {
 
 				if (line[0] == '\0' && line[1] == '\0') {
 					if ((request_.getHeader("Content-Length")).empty()) {
-						DEBUG << "HTTP -----------------------> ";
+                        http_cb_(channel_ptr);
 						parse_status_ = PARSE_REQUEST_LINE;
 					} else {
 						parse_status_ = PARSE_REQUEST_BODY;
 					}
 				} else {
 					if (parseRequestHeader(line) == false) {
-						return -1;	
-					} 
+						return -1;
+					}
 				}
-				
+
 				break;
 
 			case PARSE_REQUEST_BODY:
 
 				if (parseRequestBody(byte_buffer, start_index, n)) {
-					DEBUG << "HTTP -----------------------> ";
+                    http_cb_(channel_ptr);
 					parse_status_ = PARSE_REQUEST_LINE;
 				} else {
-					return -1;
+					return start_index;
 				}
-				
+
 				break;
 
 			default:

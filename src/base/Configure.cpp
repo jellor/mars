@@ -24,44 +24,63 @@ Configure::~Configure() {
 }
 
 const char* Configure::getValueByName(const char* name) {
-	if (! loaded_) return NULL;
+	if (! loaded_) {
+        return NULL;
+	}
+
 	const char* ret = NULL;
+
 	std::map<std::string, std::string>::iterator it = configure_map_.find(name);
 	if (it != configure_map_.end()) {
 		ret = static_cast<const char*>(it->second.c_str());
 	}
+
+    // should return type std::string.
 	return ret;
 }
 
 bool Configure::setValueByName(const char* name, const char* value) {
-	if (! loaded_) return false;
+	if (! loaded_) {
+        return false;
+	}
+
 	std::map<std::string, std::string>::iterator it = configure_map_.find(name);
 	if (it != configure_map_.end()) {
 		it->second = value;
 	} else {
 		configure_map_.insert(std::make_pair(name, value));
 	}
+
 	return saveFile(file_name_.c_str());
 }
 
 void Configure::loadFile(const char* file_name) {
 	file_name_ = file_name;
+
 	FILE* file = fopen(file_name, "r");
 	if (file == NULL) {
 		WARN << "Can not open the file " << file_name;
 		return;
 	}
+
 	char buf[512];
 	while (fgets(buf, sizeof(buf), file) != NULL) {
 		int len = strlen(buf);
+
 		if (buf[len - 1] == '\n') {
 			buf[len - 1] = 0;
 		}
 		char* p = strchr(buf, '#');
-		if(p != NULL) *p = 0;
-		if (strlen(buf) == 0) continue;
+		if(p != NULL) {
+            *p = 0;
+		}
+		if (strlen(buf) == 0) {
+            continue;
+		}
+
 		parseLine(buf);
-	} 
+	}
+
 	fclose(file);
 	loaded_ = true;
 }
@@ -85,7 +104,7 @@ bool Configure::saveFile(const char* file_name) {
 	return true;
 }
 
-void Configure::parseLine(char* line) { 
+void Configure::parseLine(char* line) {
 	char* p = strchr(line, '=');
 	*p = 0;
 	char* key = trim(line);

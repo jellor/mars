@@ -30,9 +30,12 @@ void Condition::wait() {
 bool Condition::waitForSeconds(int seconds) {
 	struct timespec ts;
 	struct timeval  tv;
+
 	gettimeofday(&tv, NULL);
+
 	ts.tv_sec  = tv.tv_sec  + seconds;
 	ts.tv_nsec = tv.tv_usec * 1000;
+
 	return pthread_cond_timedwait(&condition_, &mutex_.getMutex(), &ts) == ETIMEDOUT ? false : true;
 }
 

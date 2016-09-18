@@ -47,7 +47,7 @@ public:
         query->set_len(++len);
 
         DEBUG << "Message size " << query->ByteSize() << " Message name " << query->GetTypeName();
-        sendMessage(query, channel_ptr);
+        //sendMessage(query, channel_ptr);
     }
 };
 

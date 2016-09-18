@@ -36,8 +36,6 @@ public:
 
         sendMessage(query, channel_ptr);
 
-
-
         query->Clear();
         delete query;
 	}
@@ -84,7 +82,7 @@ int main() {
 	std::vector<IpAddress> listen_address_list;
 	std::vector<IpAddress> connect_address_list;
 	IpAddress listen_address_a("127.0.0.1", 8090);
-	IpAddress listen_address_b("127.0.0.1", 8080);
+	IpAddress listen_address_b("192.168.1.101", 8080);
 	listen_address_list.push_back(listen_address_a);
 	listen_address_list.push_back(listen_address_b);
 

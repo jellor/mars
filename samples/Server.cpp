@@ -18,7 +18,7 @@ public:
 		DEBUG << " Destructor ...";
 	}
 
-	virtual void send(const ChannelPtr& channel_ptr, char* data, int len) override {
+	virtual void send(const ChannelPtr& channel_ptr, const char* data, int len) override {
 		DEBUG << "DefaultHandler Send";
 		getNext()->send(channel_ptr, data, len);
 	}

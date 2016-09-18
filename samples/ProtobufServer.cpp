@@ -9,6 +9,7 @@
 #include "Log.h"
 #include "HttpHandler.h"
 
+using namespace std;
 using namespace mars;
 using namespace Im;
 
@@ -20,6 +21,21 @@ public:
 	virtual void onInactive(const ChannelPtr& channel_ptr) override {
 		channel_ptr->getChain()->close(channel_ptr);
 	}
+
+	virtual void onActive(const ChannelPtr& channel_ptr) override {
+		int ok;
+		DEBUG << "Enter Number";
+		cin >> ok;
+		if (ok > 0) {
+			Query* query = new Query();
+			query->set_len(9);
+			query->set_type_name(99);
+			sendMessage(query, channel_ptr);
+			DEBUG << "len " << query->len();
+			DEBUG << "type_name "<< query->type_name();
+		}
+	}
+
 	virtual void onMessage(const ChannelPtr& channel_ptr, void* message) override {
 		Query* query = (Query*)message;
         int type_name = query->type_name();
